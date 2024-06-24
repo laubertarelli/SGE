@@ -20,7 +20,7 @@ public class CasoDeUsoTramiteAlta(ITramiteRepositorio repoTram, IServicioAutoriz
         t.FechayHoraCr = DateTime.Now;
         t.FechayHoraMod = DateTime.Now;
         repoTram.AltaTramite(t);
-        actEstado.ActualizarEstado(t.ExpedienteId, user.Id);
+        actEstado.ActualizarEstado(t.ExpedienteId);
       }
     }
   }

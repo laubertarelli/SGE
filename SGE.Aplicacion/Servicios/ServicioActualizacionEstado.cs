@@ -2,7 +2,7 @@
 
 public class ServicioActualizacionEstado(IExpedienteRepositorio repo, IEspecificacionCambioEstado espec) : IServicioActualizacionEstado
 {
-  public void ActualizarEstado(int id, int idUser)
+  public void ActualizarEstado(int id)
   {
     List<object> lista = repo.ConsultaTodos(id);
     if (lista[^1] is Tramite t) // LAST INDEX

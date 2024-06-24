@@ -1,3 +1,9 @@
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
 html,
 body {
     font-family: "Poppins", Helvetica, Arial, sans-serif;
@@ -64,6 +70,5 @@ h1:focus {
 }
 
 .form-control {
-    display: inline-block;
-    margin: 5px auto;
+    width: 300px;
 }

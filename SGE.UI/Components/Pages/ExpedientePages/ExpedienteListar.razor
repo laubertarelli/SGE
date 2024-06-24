@@ -1,49 +1,87 @@
-﻿@page "/explistar"
+﻿@page "/expedientes/lista"
 @rendermode InteractiveServer
 @inject CasoDeUsoUsuarioConsultaId UsuarioConsulta
 @inject CasoDeUsoExpedienteListar CasoListar
+@inject CasoDeUsoExpedienteBaja CasoBaja
 @inject NavigationManager Navigation
+@inject SesionActual Sesion
 <PageTitle>SGE | Expedientes</PageTitle>
 
-<h3>Lista de Expedientes</h3>
-@if (expedientes.Count > 0)
-{
-<table class="table">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Caratula</th>
-            <th>Estado</th>
-            <th>Fecha de creacion</th>
-            <th>Fecha de modificacion</th>
-            <th>Ultimo usuario en modificarlo</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (Expediente e in expedientes)
-        {
-            <tr>
-                <td>@e.Id</td>
-                <td>@e.Caratula</td>
-                <td>@e.Estado</td>
-                <td>@e.FechayHoraCr</td>
-                <td>@e.FechayHoraMod</td>
-                <td>@e.IdUser</td>
-            </tr>
-        }
-    </tbody>
-</table>
-}
-else
-{
-    <br><h5>No existen expedientes</h5>
-}
-<button class="btn btn-secondary mt-2" @onclick="Volver">Volver al menu</button>
+<div class="div-container w-75 h-75">
+    <button class="btn btn-primary p-2 mb-3" @onclick="() => Agregar()"><span>+</span> Agregar expediente</button>
+    @if (expedientes.Count > 0)
+    {
+        <table class="table text-white p-2 text-center">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Caratula</th>
+                    <th>Estado</th>
+                    <th>Creado</th>
+                    <th>Ultima edición</th>
+                    <th>Usuario</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Expediente e in expedientes)
+                {
+                    <tr>
+                        <td>@e.Id</td>
+                        <td>@e.Caratula</td>
+                        <td>@e.Estado</td>
+                        <td>@e.FechayHoraCr</td>
+                        <td>@e.FechayHoraMod</td>
+                        <td>@e.IdUser</td>
+                        <td>
+                            <button class="btn btn-primary" @onclick="() => Editar(e.Id)">Editar</button>
+                            <button class="btn btn-danger" @onclick="() => Eliminar(e.Id)">Eliminar</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <br>
+        <h5>No existen expedientes</h5>
+    }
+</div>
+
 
 @code {
     List<Expediente> expedientes = [];
+    Usuario user = new();
+    string error = "";
 
-    protected override void OnInitialized() => expedientes = CasoListar.Ejecutar();
-    
+    protected override void OnInitialized()
+    {
+        try
+        {
+            user = UsuarioConsulta.Ejecutar(Sesion.User.Id);
+            expedientes = CasoListar.Ejecutar();
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+    }
+
+    void Eliminar(int id)
+    {
+        try
+        {
+            CasoBaja.Ejecutar(id, user);
+            OnInitialized();
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+    }
+
+    void Agregar() => Navigation.NavigateTo($"expedientes/agregar");
+    void Editar(int id) => Navigation.NavigateTo($"expedientes/editar/{id}");
     void Volver() => Navigation.NavigateTo($"/home");
 }

@@ -43,7 +43,7 @@
 }
 @if (Sesion.User.Id != 1)
 {
-  <p>Necesitar ser administrador para gestionar usuarios</p>
+  <p>Necesita ser administrador para gestionar usuarios</p>
 }
 <button class="btn btn-secondary mt-2" @onclick="Volver">Volver al menu</button>
 @error
@@ -52,10 +52,7 @@
   List<Usuario> usuarios = [];
   string error = "";
 
-  protected override void OnInitialized()
-  {
-    usuarios = UsuarioListar.Ejecutar();
-  }
+  protected override void OnInitialized() => usuarios = UsuarioListar.Ejecutar();
 
   void Editar(int id) => Navigation.NavigateTo($"usermod/{id}");
   void Permisos(int id) => Navigation.NavigateTo($"adminperm/{id}");

@@ -19,7 +19,7 @@ public class CasoDeUsoTramiteModificacion(ITramiteRepositorio repoTram, IServici
       {
         t.FechayHoraMod = DateTime.Now;
         repoTram.ModificacionTramite(t);
-        actEstado.ActualizarEstado(t.ExpedienteId, user.Id);
+        actEstado.ActualizarEstado(t.ExpedienteId);
       }
       
     }

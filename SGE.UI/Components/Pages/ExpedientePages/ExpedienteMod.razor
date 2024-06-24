@@ -1,19 +1,14 @@
-﻿@page "/expmod"
+﻿@page "/expmod/{Id:int?}/editar"
 @rendermode InteractiveServer
 @inject CasoDeUsoExpedienteModificacion CasoDeUsoExpedienteModificacion
-@inject CasoDeUsoExpedienteConsultaId ConsultaIdExp
+@inject CasoDeUsoExpedienteConsultaId ExpConsulta
+@inject CasoDeUsoUsuarioConsultaId UsuarioConsulta
 @inject NavigationManager Navigation
 @inject SesionActual Sesion
 <PageTitle>SGE | Expedientes</PageTitle>
 
 <h3>Modificacion de Expediente</h3>
-@if (!visible)
-{
-    <label class="mt-2" for="idExp">ID a modificar:</label>
-    <input class="form-control" @bind="idExp" id="idExp">
-    <button class="btn btn-primary mt-2" @onclick="() => Consultar(idExp)">Buscar</button><br>
-}
-else
+@if (user.Id == 1)
 {
     <form>
         <label class="mt-2" for="carat">Caratula:</label>
@@ -28,32 +23,33 @@ else
         </select><br>
     </form>
     <button class="btn btn-primary mt-2" @onclick="() => Modificar(e)">Guardar cambios</button><br>
+    <button class="btn btn-secondary mt-2" @onclick="Volver">Volver al menu</button><br>
+    <CuadroDialogo @ref=dialogo Mensaje=@error />
 }
-<button class="btn btn-secondary mt-2" @onclick="Volver">Volver al menu</button><br>
-<CuadroDialogo @ref=dialogo Mensaje=@error />
+else
+{
+    <h3>No tiene los permisos necesarios</h3>
+}
 
 
 @code {
+    [Parameter] public int Id { get; set; }
+    Usuario user = new();
     string error = "";
     Expediente e = new();
     string strEstado = "";
-    bool visible = false;
-    int idExp;
     CuadroDialogo dialogo = null!;
 
-    void Consultar(int idExp)
+    protected override void OnInitialized()
     {
         try
         {
-            e = ConsultaIdExp.Ejecutar(idExp);
-            visible = true;
-            error = "";
+            user = UsuarioConsulta.Ejecutar(Sesion.User.Id);
+            e = ExpConsulta.Ejecutar(Id);
         }
-        catch (Exception ex)
+        catch
         {
-            error = ex.Message;
-            dialogo.Mostrar();
-            visible = false;
+            Navigation.NavigateTo("/home");
         }
     }
 
@@ -75,5 +71,5 @@ else
             dialogo.Mostrar();
         }
     }
-    void Volver() => Navigation.NavigateTo($"/home");
+    void Volver() => Navigation.NavigateTo($"/explistar");
 }
