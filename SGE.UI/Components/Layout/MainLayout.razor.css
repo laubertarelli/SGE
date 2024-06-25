@@ -74,9 +74,6 @@ main {
     flex-grow: 2;
     flex-shrink: 0;
 }
-.div-container {
-    background-color: yellow;
-}
 
 .footer-container {
     background-color: #1f2937;

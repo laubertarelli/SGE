@@ -1,15 +1,15 @@
-﻿@page "/expedientes/lista"
+﻿@page "/expedientes/lista/{Page:int?}"
 @rendermode InteractiveServer
-@inject CasoDeUsoUsuarioConsultaId UsuarioConsulta
+@inject SesionActual Sesion
+@inject CasoDeuUsoExpedienteContarTotal CasoContar
 @inject CasoDeUsoExpedienteListar CasoListar
 @inject CasoDeUsoExpedienteBaja CasoBaja
 @inject NavigationManager Navigation
-@inject SesionActual Sesion
 <PageTitle>SGE | Expedientes</PageTitle>
 
-<div class="div-container w-75 h-75">
-    <button class="btn btn-primary p-2 mb-3" @onclick="() => Agregar()"><span>+</span> Agregar expediente</button>
-    @if (expedientes.Count > 0)
+<div class="div-container">
+    <button class="btn btn-primary p-2 mb-3" @onclick="() => Agregar()">+ Agregar expediente</button>
+    @if (_expedientes.Count > 0)
     {
         <table class="table text-white p-2 text-center">
             <thead>
@@ -24,7 +24,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (Expediente e in expedientes)
+                @foreach (Expediente e in _expedientes)
                 {
                     <tr>
                         <td>@e.Id</td>
@@ -41,6 +41,39 @@
                 }
             </tbody>
         </table>
+        <nav class="nav">
+            <span>Mostrando @(_cantExps > 0 ? ((_page - 1) * 5) + 1 : "0") - @((_page * 5) < _cantExps ? _page * 5 : _cantExps) de @_cantExps</span>
+            @if (_cantPages > 1)
+            {
+                <ul>
+                    <li>
+                        <div class="element prev" href="#" @onclick="PreviousPage">
+                            <span>Ant</span>
+                        </div>
+                    </li>
+                    @for (int i = 1; i <= Math.Min(_cantPages, 5); i++)
+                    {
+                        if (i == _page)
+                        {
+                            <li>
+                                <a class="element num-selected" href="@($"expedientes/lista/{i}")">@i</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li>
+                                <a class="element" href="@($"expedientes/lista/{i}")">@i</a>
+                            </li>
+                        }
+                    }
+                    <li>
+                        <div class="element next" href="#" @onclick="NextPage">
+                            <span>Sig</span>
+                        </div>
+                    </li>
+                </ul>
+            }
+        </nav>
     }
     else
     {
@@ -51,16 +84,24 @@
 
 
 @code {
-    List<Expediente> expedientes = [];
-    Usuario user = new();
+    [Parameter] public int? Page { get; set; } = 1;
+    List<Expediente> _expedientes = [];
     string error = "";
+    int _page;
+    int _cantExps;
+    int _cantPages;
+
+    bool HasPrevious => _page > 1;
+    bool HasNext => _page < _cantPages;
+    void Agregar() => Navigation.NavigateTo($"expedientes/agregar");
+    void Editar(int id) => Navigation.NavigateTo($"expedientes/editar/{id}");
+    void Volver() => Navigation.NavigateTo($"/home");
 
     protected override void OnInitialized()
     {
         try
         {
-            user = UsuarioConsulta.Ejecutar(Sesion.User.Id);
-            expedientes = CasoListar.Ejecutar();
+            Init();
         }
         catch (Exception ex)
         {
@@ -68,11 +109,49 @@
         }
     }
 
+    protected override void OnParametersSet()
+    {
+        try
+        {
+            _page = Page ?? (_cantPages > 0 ? 1 : 0);
+            if (_page > _cantPages)
+                Navigation.NavigateTo($"expedientes/lista/{_cantPages}");
+            _expedientes = CasoListar.Ejecutar(_page);
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+    }
+
+    void Init()
+    {
+        _cantExps = CasoContar.Ejecutar();
+        _cantPages = (int)Math.Ceiling(_cantExps / 5.0);
+        _page = Page ?? 1;
+        _expedientes = CasoListar.Ejecutar(_page);
+    }
+
+    void NextPage()
+    {
+        if (!HasNext)
+            return;
+        Page = _page + 1;
+        Navigation.NavigateTo($"expedientes/lista/{Page}");
+    }
+    void PreviousPage()
+    {
+        if (!HasPrevious)
+            return;
+        Page = _page - 1;
+        Navigation.NavigateTo($"expedientes/lista/{Page}");
+    }
+
     void Eliminar(int id)
     {
         try
         {
-            CasoBaja.Ejecutar(id, user);
+            CasoBaja.Ejecutar(id, Sesion.User);
             OnInitialized();
         }
         catch (Exception ex)
@@ -80,8 +159,62 @@
             error = ex.Message;
         }
     }
-
-    void Agregar() => Navigation.NavigateTo($"expedientes/agregar");
-    void Editar(int id) => Navigation.NavigateTo($"expedientes/editar/{id}");
-    void Volver() => Navigation.NavigateTo($"/home");
 }
+
+
+<style>
+    .div-container {
+        background-color: #1f2937;
+        width: 75%;
+        padding: 1.3rem 2rem;
+        border-radius: 10px;
+    }
+
+    .nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0px auto;
+        padding: 0.5rem;
+        font-size: small;
+    }
+
+        .nav ul {
+            display: inline-flex;
+            align-items: stretch;
+            margin-left: 1rem;
+            margin-bottom: 0;
+            list-style: none;
+        }
+
+    .element {
+        display: flex;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        padding: 0.50rem 0.75rem;
+        margin-left: 0;
+        color: rgb(156, 163, 175);
+        background-color: #1f2937;
+        border: 1px solid rgb(55, 65, 81);
+    }
+    .element:hover {
+        color: white;
+        background-color: rgb(55, 65, 81);
+    }
+    .prev {
+        border-top-left-radius: 0.5rem;
+        border-bottom-left-radius: 0.5rem;
+    }
+    .num-selected {
+        color: white;
+        background-color: rgb(55, 65, 81);
+    }
+    .next {
+        border-top-right-radius: 0.5rem;
+        border-bottom-right-radius: 0.5rem;
+    }
+</style>

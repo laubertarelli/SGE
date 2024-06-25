@@ -1,4 +1,4 @@
-﻿@page "/expalta"
+﻿@page "/expedientes/agregar"
 @rendermode InteractiveServer
 @inject CasoDeUsoExpedienteAlta CasoAlta
 @inject NavigationManager Navigation
@@ -37,7 +37,7 @@
         {
             e.Estado = (EstadoExpediente)Enum.Parse(typeof(EstadoExpediente), strEstado);
             CasoAlta.Ejecutar(e, Sesion.User);
-            Navigation.NavigateTo($"/explistar");
+            Navigation.NavigateTo($"/expedientes/lista");
         }
         catch (Exception ex)
         {

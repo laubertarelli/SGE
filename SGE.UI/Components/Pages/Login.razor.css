@@ -6,7 +6,7 @@
 	padding-left: 2em;
 	padding-right: 2em;
 	padding-bottom: 0.4em;
-	background-color: #171717;
+	background-color: #1f2937;
 	border-radius: 25px;
 	transition: .4s ease-in-out;
 }
@@ -28,13 +28,12 @@
 	align-items: center;
 	justify-content: center;
 	gap: 0.5em;
-	border-radius: 25px;
+	border-radius: 10px;
 	padding: 0.6em;
 	border: none;
 	outline: none;
 	color: white;
-	background-color: #171717;
-	box-shadow: inset 2px 5px 10px rgb(5, 5, 5);
+	background-color: #374151;
 }
 
 .input-icon {
@@ -67,14 +66,9 @@
 	border: none;
 	outline: none;
 	transition: .4s ease-in-out;
-	background-color: #252525;
+	background-color: #2563EB;
 	color: white;
 }
-
-	.button1:hover {
-		background-color: black;
-		color: white;
-	}
 
 .button2 {
 	padding: 0.5em;
@@ -84,27 +78,6 @@
 	border: none;
 	outline: none;
 	transition: .4s ease-in-out;
-	background-color: #252525;
+	background-color: #2563EB;
 	color: white;
 }
-
-	.button2:hover {
-		background-color: black;
-		color: white;
-	}
-
-.button3 {
-	margin-bottom: 3em;
-	padding: 0.5em;
-	border-radius: 5px;
-	border: none;
-	outline: none;
-	transition: .4s ease-in-out;
-	background-color: #252525;
-	color: white;
-}
-
-	.button3:hover {
-		background-color: red;
-		color: white;
-	}

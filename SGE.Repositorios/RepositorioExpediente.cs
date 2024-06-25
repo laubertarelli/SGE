@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SGE.Aplicacion;
+﻿using SGE.Aplicacion;
 namespace SGE.Repositorios;
 
 public class RepositorioExpediente : IExpedienteRepositorio
@@ -54,9 +53,15 @@ public class RepositorioExpediente : IExpedienteRepositorio
         return lista;
     }
 
-    public List<Expediente> ListarExpedientes()
+    public int ContarTotal()
     {
         using var context = new BaseContext();
-        return context.Expedientes.ToList();
+        return context.Expedientes.Count();
+    }
+
+    public List<Expediente> ListarExpedientes(int page)
+    {
+        using var context = new BaseContext();
+        return context.Expedientes.Skip((page - 1) * 5).Take(5).ToList();
     }
 }

@@ -1,6 +1,6 @@
-using SGE.UI.Components;
-using SGE.Repositorios;
 using SGE.Aplicacion;
+using SGE.Repositorios;
+using SGE.UI.Components;
 
 
 BaseSqlite.Inicializar();
@@ -19,6 +19,7 @@ builder.Services
     .AddTransient<CasoDeUsoExpedienteListar>()
     .AddTransient<CasoDeUsoExpedienteConsultaId>()
     .AddTransient<CasoDeUsoExpedienteConsultaTodos>()
+    .AddTransient<CasoDeuUsoExpedienteContarTotal>()
     // CASOS DE TRAMITE
     .AddTransient<CasoDeUsoTramiteAlta>()
     .AddTransient<CasoDeUsoTramiteBaja>()

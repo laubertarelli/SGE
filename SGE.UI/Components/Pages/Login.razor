@@ -39,6 +39,7 @@
             user = CasoLogin.Ejecutar(email, pass);
             Sesion.User = user;
             Navigation.NavigateTo($"/home", true);
+            StateHasChanged();
         }
         catch (Exception ex)
         {
