@@ -1,41 +1,123 @@
 ﻿@page "/signup"
 @rendermode InteractiveServer
 @inject CasoDeUsoUsuarioSignup CasoSignup
-@inject NavigationManager NavigationManager
+@inject NavigationManager Navigation
 <PageTitle>SGE | Signup</PageTitle>
 
-<h3>Ingrese sus datos personales</h3>
-<form>
-    <input class="form-control" type="text" placeholder="Nombre" @bind="u.Nombre"><br>
-    <input class="form-control" type="text" placeholder="Apellido" @bind="u.Apellido"><br>
-    <input class="form-control" type="email" placeholder="Email" @bind="u.Email"><br>
-    <input class="form-control" type="password" placeholder="Contraseña" @bind="u.Contraseña"><br>
+<form class="form" @onsubmit="Registrar">
+    <p id="heading">Ingresar Datos Personales</p>
+    <div class="field">
+        <input class="input" type="text" placeholder="Nombre" @bind="u.Nombre" />
+    </div>
+    <div class="field">
+        <input class="input" type="text" placeholder="Apellido" @bind="u.Apellido" />
+    </div>
+    <div class="field">
+        <input class="input" type="text" placeholder="Email" @bind="u.Email" />
+    </div>
+    <div class="field">
+        <input class="input" type="password" placeholder="Contraseña" @bind="u.Contraseña" />
+    </div>
+    <div class="field">
+        <input class="input" type="password" placeholder="Repetir contraseña" @bind="_repPassword" />
+    </div>
+    <div class="div-btn">
+        <button type="submit" class="button">Aceptar</button>
+    </div>
 </form>
-<button class="btn btn-primary mt-2" @onclick="Agregar">Aceptar</button><br>
-<button class="btn btn-secondary mt-2" @onclick="Volver">Volver al inicio</button>
 <CuadroDialogo @ref=dialogo Mensaje=@error />
 
 @code {
     Usuario u = new Usuario();
     string error = "";
     CuadroDialogo dialogo = null!;
-    string pwant = "";
+    string _repPassword = "";
 
-    void Agregar()
+    void Registrar()
     {
         try
         {
-            pwant = u.Contraseña;
+            if (!_repPassword.Equals(u.Contraseña))
+            {
+                error = "La contraseña no coincide";
+                dialogo.Mostrar();
+                return;
+            }
             CasoSignup.Ejecutar(u);
-            Volver();
+            Navigation.NavigateTo("/");
         }
         catch (Exception ex)
         {
             error = ex.Message;
-            u.Contraseña = pwant;
             dialogo.Mostrar();
         }
     }
-
-    void Volver() => NavigationManager.NavigateTo($"/");
 }
+
+<style>
+    .form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background-color: #1f2937;
+        width: 420px;
+        padding-left: 2em;
+        padding-right: 2em;
+        padding-bottom: 0.4em;
+        border-radius: 10px;
+    }
+
+    #heading {
+        text-align: center;
+        margin: 2em;
+        color: rgb(255, 255, 255);
+        font-size: 1.2em;
+    }
+
+    .field {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5em;
+        border-radius: 10px;
+        padding: 0.6em;
+        border: none;
+        outline: none;
+        color: white;
+        background-color: #374151;
+    }
+
+    .input {
+        background: none;
+        border: none;
+        outline: none;
+        width: 100%;
+        color: #d3d3d3;
+    }
+
+    option {
+        background-color: #374151;
+        color: #d3d3d3;
+        padding: 1rem;
+    }
+
+    .div-btn {
+        display: flex;
+        justify-content: center;
+        flex-direction: row;
+        margin-top: 2.5em;
+        padding: .375rem .75rem;
+    }
+
+    .button {
+        padding: 0.5em;
+        padding-left: 1.1em;
+        padding-right: 1.1em;
+        border-radius: 5px;
+        border: none;
+        outline: none;
+        background-color: #2563EB;
+        color: white;
+    }
+</style>

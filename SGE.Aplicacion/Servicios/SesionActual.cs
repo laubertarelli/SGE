@@ -2,10 +2,10 @@
 
 public class SesionActual
 {
-    public Usuario User { get; set; } = new();
+    public Usuario? User { get; set; }
 
     public void CerrarSesion()
     {
-        User = new Usuario();
+        User = null;
     }
 }

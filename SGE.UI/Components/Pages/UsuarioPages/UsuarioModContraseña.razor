@@ -1,57 +1,61 @@
-﻿@page "/expedientes/agregar"
+﻿@page "/cuenta/editar"
 @rendermode InteractiveServer
-@inject CasoDeUsoExpedienteAlta CasoAlta
-@inject NavigationManager Navigation
 @inject SesionActual Sesion
-<PageTitle>SGE | Expedientes</PageTitle>
+@inject CasoDeUsoUsuarioModContraseña CasoModificacion
+@inject NavigationManager Navigation
+<PageTitle>SGE | Cuenta</PageTitle>
 
-<form class="form">
-    <p id="heading">Agregar Expediente</p>
+<form class="form" @onsubmit="Cambiar">
+    <p id="heading">Cambiar Contraseña</p>
     <div class="field">
-        <input class="input" placeholder="Caratula" @bind="e.Caratula">
+        <input type="password" class="input" placeholder="Contraseña" @bind="_password" />
     </div>
     <div class="field">
-        <select class="input" @bind="strEstado">
-            <option value="" disabled selected>Seleccione un estado</option>
-            <option>RecienIniciado</option>
-            <option>ParaResolver</option>
-            <option>ConResolucion</option>
-            <option>EnNotificacion</option>
-            <option>Finalizado</option>
-        </select>
+        <input type="password" class="input" placeholder="Nueva contraseña" @bind="_newPassword" />
+    </div>
+    <div class="field">
+        <input type="password" class="input" placeholder="Repetir contraseña" @bind="_repPassword" />
     </div>
     <div class="div-btn">
-        <button class="button" @onclick="() => Agregar(e)">Aceptar</button>
+        <button type="submit" class="button">Cambiar</button>
     </div>
 </form>
-<CuadroDialogo @ref=dialogo Mensaje=@error />
-
+<CuadroDialogo @ref=_dialogo Mensaje=@_error />
 
 @code {
-    [Parameter] public int Id { get; set; }
-    Expediente e = new();
-    string strEstado = "";
-    string error = "";
-    CuadroDialogo dialogo = null!;
+    Usuario _user = new();
+    CuadroDialogo _dialogo = null!;
+    string _error = "";
+    string _password = "";
+    string _newPassword = "";
+    string _repPassword = "";
 
-    void Agregar(Expediente e)
+    protected override void OnInitialized()
+    {
+        if (Sesion.User is not null)
+        {
+            _user = Sesion.User;
+        }
+    }
+
+    void Cambiar()
     {
         try
         {
-            e.Estado = (EstadoExpediente)Enum.Parse(typeof(EstadoExpediente), strEstado);
-            CasoAlta.Ejecutar(e, Sesion.User);
-            Navigation.NavigateTo($"/expedientes/lista");
+            if (!_repPassword.Equals(_newPassword))
+            {
+                _error = "La contraseña no coincide";
+                _dialogo.Mostrar();
+                return;
+            }
+            CasoModificacion.Ejecutar(_user, _password, _newPassword);
+            Navigation.NavigateTo("/cuenta");
         }
         catch (Exception ex)
         {
-            error = ex.Message;
-            if (error == "Must specify valid information for parsing in the string. (Parameter 'value')")
-            {
-                error = "Debe seleccionar un estado";
-            }
-            dialogo.Mostrar();
+            _error = ex.Message;
+            _dialogo.Mostrar();
         }
-
     }
 }
 
@@ -109,7 +113,7 @@
         margin-top: 2.5em;
         padding: .375rem .75rem;
     }
-    
+
     .button {
         padding: 0.5em;
         padding-left: 1.1em;

@@ -2,5 +2,6 @@
 
 public interface IServicioHash
 {
-    public string GetHash(string pass);
+    public string Encrypt(string password);
+    public bool Validate(string txt, string hash);
 }

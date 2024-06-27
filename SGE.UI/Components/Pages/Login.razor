@@ -1,10 +1,11 @@
-﻿@rendermode InteractiveServer
+﻿@page "/"
+@rendermode InteractiveServer
 @inject CasoDeUsoUsuarioLogin CasoLogin
 @inject NavigationManager Navigation
 @inject SesionActual Sesion
 <PageTitle>SGE | Login</PageTitle>
 
-<form class="form">
+<form class="form" @onsubmit="Ingresar">
     <p id="heading">Bienvenido</p>
     <div class="field">
         <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -19,14 +20,14 @@
         <input placeholder="Contraseña" class="input-field" type="password" @bind="pass">
     </div>
     <div class="btn">
-        <button class="button1" @onclick="Ingresar">Iniciar Sesion</button>
-        <button class="button2" @onclick="Registrar">Registrarse</button>
+        <button type="submit" class="button1">Iniciar Sesion</button>
+        <button type="button" class="button2" @onclick="Registrar">Registrarse</button>
     </div>
 </form>
+
 <CuadroDialogo @ref=dialogo Mensaje=@error />
 
 @code {
-    Usuario user = new();
     string email = "";
     string pass = "";
     string error = "";
@@ -36,10 +37,8 @@
     {
         try
         {
-            user = CasoLogin.Ejecutar(email, pass);
-            Sesion.User = user;
+            Sesion.User = CasoLogin.Ejecutar(email, pass);
             Navigation.NavigateTo($"/home", true);
-            StateHasChanged();
         }
         catch (Exception ex)
         {
@@ -47,5 +46,92 @@
             dialogo.Mostrar();
         }
     }
-    void Registrar() => Navigation.NavigateTo("/signup", true);
+    void Registrar() => Navigation.NavigateTo("/signup");
 }
+
+<style>
+	.form {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		width: 420px;
+		padding-left: 2em;
+		padding-right: 2em;
+		padding-bottom: 0.4em;
+		background-color: #1f2937;
+		border-radius: 10px;
+		transition: .4s ease-in-out;
+	}
+
+		.form:hover {
+			transform: scale(1.05);
+			border: 1px solid black;
+		}
+
+	#heading {
+		text-align: center;
+		margin: 2em;
+		color: rgb(255, 255, 255);
+		font-size: 1.2em;
+	}
+
+	.field {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5em;
+		border-radius: 10px;
+		padding: 0.6em;
+		border: none;
+		outline: none;
+		color: white;
+		background-color: #374151;
+	}
+
+	.input-icon {
+		height: 1.3em;
+		width: 1.3em;
+		fill: white;
+	}
+
+	.input-field {
+		background: none;
+		border: none;
+		outline: none;
+		width: 100%;
+		color: #d3d3d3;
+	}
+
+	.form .btn {
+		display: flex;
+		justify-content: center;
+		flex-direction: row;
+		margin-top: 2.5em;
+	}
+
+	.button1 {
+		padding: 0.5em;
+		padding-left: 1.1em;
+		padding-right: 1.1em;
+		border-radius: 5px;
+		margin-right: 0.5em;
+		border: none;
+		outline: none;
+		transition: .4s ease-in-out;
+		background-color: #2563EB;
+		color: white;
+	}
+
+	.button2 {
+		padding: 0.5em;
+		padding-left: 2.3em;
+		padding-right: 2.3em;
+		border-radius: 5px;
+		border: none;
+		outline: none;
+		transition: .4s ease-in-out;
+		background-color: #6C757D;
+		color: white;
+	}
+
+</style>

@@ -1,20 +1,24 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace SGE.Aplicacion;
 
-public class ServicioHash: IServicioHash
+public class ServicioHash : IServicioHash
 {
-    public string GetHash(string pass)
+    public string Encrypt(string password)
     {
-        using SHA256 mySHA = SHA256.Create();
-        byte[] bytes = mySHA.ComputeHash(Encoding.UTF8.GetBytes(pass));
-        var sb = new StringBuilder();
-        for (int i = 0; i < bytes.Length; i++)
+        // Compute hash from password
+        byte[] hashedBytes = SHA256.HashData(Encoding.UTF8.GetBytes(password));
+
+        // Convert byte array to a string
+        StringBuilder builder = new();
+        for (int i = 0; i < hashedBytes.Length; i++)
         {
-            sb.Append(bytes[i].ToString());
+            //converted to its hexadecimal representation using the ToString("x2") 
+            builder.Append(hashedBytes[i].ToString("x2"));
         }
-        return sb.ToString();
+        return builder.ToString();
     }
+
+    public bool Validate(string txt, string hash) => Encrypt(txt) == hash;
 }

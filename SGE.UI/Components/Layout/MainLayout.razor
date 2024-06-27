@@ -1,26 +1,37 @@
 ﻿@inherits LayoutComponentBase
 @inject SesionActual Sesion
 @inject CasoDeUsoUsuarioConsultaId UsuarioConsulta
+@inject NavigationManager Navigation
 
 <div class="page">
     <header>
-        <img class="logo" src="./favicon.png" alt="logo"/>
-        <nav>
-            <ul class="nav-links">
-                <li><a href="/expedientes/lista">Expedientes</a></li>
-                <li><a href="/tramitelistar">Tramites</a></li>
-                @if (Sesion.User.Id == 1)
+        <a class="d-flex gap-2 align-baseline text-decoration-none" href="/home">
+            <img alt="logo" src="./logo.png" />
+            <span class="fs-2 fw-bold text-white">SGE</span>
+        </a>
+        <div>
+            <nav class="div-nav">
+                @if (Sesion.User != null)
                 {
-                    <li><a href="/gestion">Usuarios</a></li>
+                    <ul class="nav-links">
+                        <li><a href="/expedientes/lista">Expedientes</a></li>
+                        <li><a href="/tramitelistar">Tramites</a></li>
+                        @if (Sesion.User?.Id == 1)
+                        {
+                            <li><a href="/gestion">Usuarios</a></li>
+                        }
+                    </ul>
+                    <a href="/cuenta"><button class="btn-header">Cuenta</button></a>
                 }
-            </ul>
-        </nav>
-        <a class="cta" href="#"><button class="btn-header">Cuenta</button></a>
+            </nav>
+        </div>
     </header>
+
     <main class="content px-4">
         @Body
     </main>
-    <footer>
+
+    <footer class="d-flex">
         <div class="footer-container">
             <div class="footer-info">
                 <a class="footer-title text-white">
@@ -40,13 +51,136 @@
 @code {
     protected override void OnInitialized()
     {
-        try
+        string url = Navigation.ToBaseRelativePath(Navigation.Uri).ToLower();
+        if ((Sesion.User is null) && !string.IsNullOrEmpty(url) && !url.StartsWith("signup"))
         {
-            Sesion.User = UsuarioConsulta.Ejecutar(Sesion.User.Id);
+            Navigation.NavigateTo("/");
         }
-        catch (Exception ex)
+        if ((Sesion.User is not null) && (string.IsNullOrEmpty(url) || url.StartsWith("signup")))
         {
-            Console.WriteLine(ex.Message); // TEMPORAL
+            Navigation.NavigateTo("/home");
         }
+        base.OnInitialized();
     }
 }
+
+<style>
+    .page {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        background-color: #111827;
+        color: #f5f5f4;
+    }
+
+    header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 30px 10%;
+        background-color: #1f2937;
+    }
+
+        header img {
+            cursor: pointer;
+            height: 50px;
+            width: 50px;
+        }
+
+    .div-nav {
+        display: flex;
+        align-items: baseline;
+    }
+
+    .nav-links {
+        list-style: none;
+    }
+
+        .nav-links li {
+            display: inline-block;
+            padding: 0px 20px;
+            font-weight: 500;
+            font-size: 16px;
+            color: #edf0f1;
+            text-decoration: none;
+        }
+
+            .nav-links li a {
+                transition: all 0.3s ease 0;
+                font-weight: 500;
+                font-size: 16px;
+                color: #edf0f1;
+                text-decoration: none;
+            }
+
+    .btn-header {
+        margin-left: 20px;
+        padding: 9px 25px;
+        background-color: #2563EB;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 16px;
+        color: #edf0f1;
+        text-decoration: none;
+    }
+
+    main {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        flex-basis: 300px;
+        flex-grow: 2;
+        flex-shrink: 0;
+    }
+
+    .footer-container {
+        background-color: #1f2937;
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: column;
+        flex-grow: 0.001;
+        gap: 2rem;
+        padding: 2rem 1rem;
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .footer-info {
+        text-align: center;
+    }
+
+    .footer-title {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        font-size: 1.125rem;
+        line-height: 1.75rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    #blazor-error-ui {
+        background: lightyellow;
+        bottom: 0;
+        box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+        display: none;
+        left: 0;
+        padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+        position: fixed;
+        width: 100%;
+        z-index: 1000;
+    }
+
+        #blazor-error-ui .dismiss {
+            cursor: pointer;
+            position: absolute;
+            right: 0.75rem;
+            top: 0.5rem;
+        }
+</style>

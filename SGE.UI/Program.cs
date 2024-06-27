@@ -33,6 +33,7 @@ builder.Services
     .AddTransient<CasoDeUsoUsuarioLogin>()
     .AddTransient<CasoDeUsoUsuarioEliminar>()
     .AddTransient<CasoDeUsoUsuarioModificacion>()
+    .AddTransient<CasoDeUsoUsuarioModContraseña>()
     .AddTransient<CasoDeUsoUsuarioConsultaId>()
     .AddTransient<CasoDeUsoUsuarioListar>()
     .AddTransient<CasoDeUsoUsuarioOtorgarPermiso>()

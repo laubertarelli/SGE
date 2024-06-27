@@ -1,8 +1,4 @@
 ﻿@page "/home"
-@rendermode InteractiveServer
-@inject CasoDeUsoUsuarioConsultaId UsuarioConsulta
-@inject NavigationManager Navigation
-@inject SesionActual Sesion
 <PageTitle>SGE | Home</PageTitle>
 
 <div>
@@ -16,73 +12,3 @@
         <li>Realiza validaciones para evitar el ingreso de elementos que no cumplan con ciertos requisitos.</li>
     </ul>
 </div>
-
-@* <h3>Bienvenido @Sesion.User.Nombre @Sesion.User.Apellido</h3>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Expedientes</th>
-            <th>Tramites</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr> 
-            <td><NavLink class="nav-link" href="@($"/expalta")">Agregar expediente</NavLink></td>
-            <td><NavLink class="nav-link" href="@($"/tramitealta")">Agregar tramite</NavLink></td>
-        </tr>
-        <tr> 
-            <td><NavLink class="nav-link" href="@($"/expbaja")">Eliminar expediente</NavLink></td>
-            <td><NavLink class="nav-link" href="@($"/tramitebaja")">Eliminar tramite</NavLink></td>
-        </tr>
-        <tr> 
-            <td><NavLink class="nav-link" href="@($"/expmod")">Modificar expediente</NavLink></td>
-            <td><NavLink class="nav-link" href="@($"/tramitemodificacion")">Modificar tramite</NavLink></td>
-        </tr>
-        <tr>
-            <td><NavLink class="nav-link" href="@($"/explistar")">Lista de expedientes</NavLink></td>
-            <td><NavLink class="nav-link" href="@($"/tramitelistar")">Lista de tramites</NavLink></td>
-        </tr>
-        <tr>
-            <td><NavLink class="nav-link" href="@($"/expconsultaid")">Consultar expediente con ID</NavLink></td>
-            <td><NavLink class="nav-link" href="@($"/tramiteconsultaid")">Consultar tramite con ID</NavLink></td>
-        </tr>
-        <tr>
-            <td><NavLink class="nav-link" href="@($"/exptramlistar")">Listar expediente junto a sus tramites</NavLink></td>
-            <td><NavLink class="nav-link" href="@($"/tramiteconsultaetiqueta")">Consultar tramites con etiqueta</NavLink></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td><NavLink class="nav-link" href="@($"/tramiteconsultaexpid")">Consultar tramites con ID de expediente</NavLink></td>
-        </tr>
-    </tbody>
-</table>
-@if (Sesion.User.Id == 1)
-{
-    <button class="btn btn-primary m-2"><NavLink class="nav-link text-white" href="/gestion">Gestion de Usuarios</NavLink></button>
-}
-else
-{
-    <button class="btn btn-primary m-2"><NavLink class="nav-link text-white" href="@($"/usermod/{Sesion.User.Id}")">Cambiar datos personales</NavLink></button>
-}
-<button class="btn btn-danger m-2"><NavLink class="nav-link text-white" @onclick="Cerrar">Cerrar Sesion</NavLink></button> *@
-
-
-@code {
-    protected override void OnInitialized()
-    {
-        try
-        {
-            Sesion.User = UsuarioConsulta.Ejecutar(Sesion.User.Id);
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message); // TEMPORAL
-        }
-    }
-    void Cerrar()
-    {
-        Sesion.CerrarSesion();
-        Navigation.NavigateTo("/");
-    }
-}

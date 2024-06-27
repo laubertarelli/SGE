@@ -4,15 +4,15 @@ public class CasoDeUsoUsuarioLogin(IUsuarioRepositorio repoUser, IServicioHash h
 {
     public Usuario Ejecutar(string email, string pass)
     {
-        string hash = hashing.GetHash(pass);
-        Usuario? user = repoUser.Login(email, hash);
-        if (user == null)
+        Usuario? user = repoUser.GetUsuario(email);
+        if (user is null)
         {
-            throw new UsuarioException("El usuario no existe");
+            throw new UsuarioException("El email ingresado no existe");
         }
-        else
+        if (!hashing.Validate(pass, user.Contraseña))
         {
-            return user;
+            throw new UsuarioException("La contraseña ingresada es incorrecta");
         }
+        return user;
     }
 }

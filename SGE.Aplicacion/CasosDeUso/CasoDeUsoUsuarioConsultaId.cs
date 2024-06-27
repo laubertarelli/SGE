@@ -9,9 +9,6 @@ public class CasoDeUsoUsuarioConsultaId(IUsuarioRepositorio repoUser)
         {
             throw new UsuarioException("El usuario no existe");
         }
-        else
-        {
-            return user;
-        }
+        return user;
     }
 }
