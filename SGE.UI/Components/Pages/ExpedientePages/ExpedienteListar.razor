@@ -1,7 +1,7 @@
 ﻿@page "/expedientes/lista/{Page:int?}"
 @rendermode InteractiveServer
 @inject SesionActual Sesion
-@inject CasoDeuUsoExpedienteContarTotal CasoContar
+@inject CasoDeUsoExpedienteContarTotal CasoContar
 @inject CasoDeUsoExpedienteListar CasoListar
 @inject CasoDeUsoExpedienteBaja CasoBaja
 @inject NavigationManager Navigation
@@ -33,10 +33,13 @@
                         <td>@e.FechayHoraCr</td>
                         <td>@e.FechayHoraMod</td>
                         <td>@e.IdUser</td>
-                        <td>
-                            <button class="btn btn-primary" @onclick="() => Editar(e.Id)">Editar</button>
-                            <button class="btn btn-danger" @onclick="() => Eliminar(e.Id)">Eliminar</button>
-                        </td>
+                        @if (_user.Id == 1)
+                        {
+                            <td>
+                                <button class="btn btn-primary" @onclick="() => Editar(e.Id)">Editar</button>
+                                <button class="btn btn-danger" @onclick="() => Eliminar(e.Id)">Eliminar</button>
+                            </td>
+                        }
                     </tr>
                 }
             </tbody>
@@ -81,46 +84,30 @@
         <h5>No existen expedientes</h5>
     }
 </div>
+<CuadroDialogo @ref="_dialogo" Mensaje=@_error />
 
 
 @code {
     [Parameter] public int? Page { get; set; } = 1;
+    CuadroDialogo _dialogo = null!;
+    Usuario _user = new();
     List<Expediente> _expedientes = [];
-    string error = "";
+    string _error = "";
     int _page;
     int _cantExps;
     int _cantPages;
 
     bool HasPrevious => _page > 1;
     bool HasNext => _page < _cantPages;
-    void Agregar() => Navigation.NavigateTo($"expedientes/agregar");
+    void Agregar() => Navigation.NavigateTo("expedientes/agregar");
     void Editar(int id) => Navigation.NavigateTo($"expedientes/editar/{id}");
-    void Volver() => Navigation.NavigateTo($"/home");
 
     protected override void OnInitialized()
     {
-        try
+        if (Sesion.User is not null)
         {
+            _user = Sesion.User;
             Init();
-        }
-        catch (Exception ex)
-        {
-            error = ex.Message;
-        }
-    }
-
-    protected override void OnParametersSet()
-    {
-        try
-        {
-            _page = Page ?? (_cantPages > 0 ? 1 : 0);
-            if (_page > _cantPages)
-                Navigation.NavigateTo($"expedientes/lista/{_cantPages}");
-            _expedientes = CasoListar.Ejecutar(_page);
-        }
-        catch (Exception ex)
-        {
-            error = ex.Message;
         }
     }
 
@@ -132,32 +119,41 @@
         _expedientes = CasoListar.Ejecutar(_page);
     }
 
+    protected override void OnParametersSet()
+    {
+        _page = Page ?? 1;
+        if (_page < 1)
+        {
+            Navigation.NavigateTo("expedientes/lista");
+        }
+        if (_cantPages > 0 && _page > _cantPages)
+        {
+            Navigation.NavigateTo($"expedientes/lista/{_cantPages}");
+        }
+        _expedientes = CasoListar.Ejecutar(_page);
+    }
+
     void NextPage()
     {
-        if (!HasNext)
-            return;
-        Page = _page + 1;
-        Navigation.NavigateTo($"expedientes/lista/{Page}");
+        if (HasNext)
+        {
+            Page = _page + 1;
+            Navigation.NavigateTo($"expedientes/lista/{Page}");
+        }
     }
     void PreviousPage()
     {
-        if (!HasPrevious)
-            return;
-        Page = _page - 1;
-        Navigation.NavigateTo($"expedientes/lista/{Page}");
+        if (HasPrevious)
+        {
+            Page = _page - 1;
+            Navigation.NavigateTo($"expedientes/lista/{Page}");
+        }
     }
 
     void Eliminar(int id)
     {
-        try
-        {
-            CasoBaja.Ejecutar(id, Sesion.User);
-            OnInitialized();
-        }
-        catch (Exception ex)
-        {
-            error = ex.Message;
-        }
+        CasoBaja.Ejecutar(id, _user);
+        OnInitialized();
     }
 }
 
@@ -201,18 +197,22 @@
         background-color: #1f2937;
         border: 1px solid rgb(55, 65, 81);
     }
-    .element:hover {
-        color: white;
-        background-color: rgb(55, 65, 81);
-    }
+
+        .element:hover {
+            color: white;
+            background-color: rgb(55, 65, 81);
+        }
+
     .prev {
         border-top-left-radius: 0.5rem;
         border-bottom-left-radius: 0.5rem;
     }
+
     .num-selected {
         color: white;
         background-color: rgb(55, 65, 81);
     }
+
     .next {
         border-top-right-radius: 0.5rem;
         border-bottom-right-radius: 0.5rem;

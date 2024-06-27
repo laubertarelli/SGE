@@ -33,10 +33,16 @@ public class RepositorioTramite : ITramiteRepositorio
         context.SaveChanges();
     }
 
-    public List<Tramite> ListarTramites()
+    public List<Tramite> ListarTramites(int page)
     {
         using var context = new BaseContext();
-        return context.Tramites.ToList();
+        return context.Tramites.Skip((page - 1) * 5).Take(5).ToList();
+    }
+
+    public int ContarTotal()
+    {
+        using var context = new BaseContext();
+        return context.Tramites.Count();
     }
 
     public List<Tramite> ConsultaPorEtiqueta(EtiquetaTramite e)

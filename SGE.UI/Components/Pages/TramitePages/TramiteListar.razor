@@ -1,51 +1,221 @@
-﻿@page "/tramitelistar"
+﻿@page "/tramites/lista/{Page:int?}"
 @rendermode InteractiveServer
+@inject SesionActual Sesion
+@inject CasoDeUsoTramiteContarTotal CasoContar
 @inject CasoDeUsoTramiteListar CasoListar
+@inject CasoDeUsoTramiteBaja CasoBaja
 @inject NavigationManager Navigation
 <PageTitle>SGE | Tramites</PageTitle>
 
-<h3>Lista de Tramites</h3>
-@if (tramites.Count > 0)
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>ID del expediente</th>
-                <th>Etiqueta</th>
-                <th>Contenido</th>
-                <th>Fecha de creacion</th>
-                <th>Fecha de modificacion</th>
-                <th>Ultimo usuario en modificarlo</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (Tramite t in tramites)
-            {
+<div class="div-container">
+    <button class="btn btn-primary p-2 mb-3" @onclick="() => Agregar()">+ Agregar tramite</button>
+    @if (_cantTramites > 0)
+    {
+        <table class="table text-white p-2 text-center">
+            <thead>
                 <tr>
-                    <td>@t.Id</td>
-                    <td>@t.ExpedienteId</td>
-                    <td>@t.Etiqueta</td>
-                    <td>@t.Contenido</td>
-                    <td>@t.FechayHoraCr</td>
-                    <td>@t.FechayHoraMod</td>
-                    <td>@t.IdUser</td>
+                    <th>#</th>
+                    <th># expediente</th>
+                    <th>Contenido</th>
+                    <th>Etiqueta</th>
+                    <th>Creado</th>
+                    <th>Ultima edición</th>
+                    <th>Usuario</th>
+                    <th></th>
                 </tr>
+            </thead>
+            <tbody>
+                @foreach (Tramite t in _tramites)
+                {
+                    <tr>
+                        <td>@t.Id</td>
+                        <td>@t.ExpedienteId</td>
+                        <td>@t.Contenido</td>
+                        <td>@t.Etiqueta</td>
+                        <td>@t.FechayHoraCr</td>
+                        <td>@t.FechayHoraMod</td>
+                        <td>@t.IdUser</td>
+                        @if (_user.Id == 1)
+                        {
+                            <td>
+                                <button class="btn btn-primary" @onclick="() => Editar(t.Id)">Editar</button>
+                                <button class="btn btn-danger" @onclick="() => Eliminar(t.Id)">Eliminar</button>
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <nav class="nav">
+            <span>Mostrando @(_cantTramites > 0 ? ((_page - 1) * 5) + 1 : "0") - @((_page * 5) < _cantTramites ? _page * 5 : _cantTramites) de @_cantTramites</span>
+            @if (_cantPages > 1)
+            {
+                <ul>
+                    <li>
+                        <div class="element prev" href="#" @onclick="PreviousPage">
+                            <span>Ant</span>
+                        </div>
+                    </li>
+                    @for (int i = 1; i <= Math.Min(_cantPages, 5); i++)
+                    {
+                        if (i == _page)
+                        {
+                            <li>
+                                <a class="element num-selected" href="@($"tramites/lista/{i}")">@i</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li>
+                                <a class="element" href="@($"tramites/lista/{i}")">@i</a>
+                            </li>
+                        }
+                    }
+                    <li>
+                        <div class="element next" href="#" @onclick="NextPage">
+                            <span>Sig</span>
+                        </div>
+                    </li>
+                </ul>
             }
-        </tbody>
-    </table>
-}
-else
-{
-    <br><h5>No existen tramites</h5>
-}
-<button class="btn btn-secondary mt-2" @onclick="Volver">Volver al menu</button>
+        </nav>
+    }
+    else
+    {
+        <br>
+        <h5>No existen tramites</h5>
+    }
+</div>
+<CuadroDialogo @ref="_dialogo" Mensaje=@_error />
 
 
 @code {
-    List<Tramite> tramites = [];
+    [Parameter] public int? Page { get; set; } = 1;
+    CuadroDialogo _dialogo = null!;
+    Usuario _user = new();
+    List<Tramite> _tramites = [];
+    string _error = "";
+    int _page;
+    int _cantTramites;
+    int _cantPages;
 
-    protected override void OnInitialized() => tramites = CasoListar.Ejecutar();
+    bool HasPrevious => _page > 1;
+    bool HasNext => _page < _cantPages;
+    void Agregar() => Navigation.NavigateTo("tramites/agregar");
+    void Editar(int id) => Navigation.NavigateTo($"tramites/editar/{id}");
 
-    void Volver() => Navigation.NavigateTo($"/home");
+    protected override void OnInitialized()
+    {
+        if (Sesion.User is not null)
+        {
+            _user = Sesion.User;
+            Init();
+        }
+    }
+
+    void Init()
+    {
+        _page = Page ?? 1;
+        _cantTramites = CasoContar.Ejecutar();
+        _cantPages = (int)Math.Ceiling(_cantTramites / 5.0);
+        _tramites = CasoListar.Ejecutar(_page);
+    }
+
+    protected override void OnParametersSet()
+    {
+        _page = Page ?? 1;
+        if (_page < 1)
+        {
+            Navigation.NavigateTo("tramites/lista");
+        }
+        if (_cantPages > 0 && _page > _cantPages)
+        {
+            Navigation.NavigateTo($"tramites/lista/{_cantPages}");
+        }
+        _tramites = CasoListar.Ejecutar(_page);
+    }
+
+    void NextPage()
+    {
+        if (HasNext)
+        {
+            Page = _page + 1;
+            Navigation.NavigateTo($"tramites/lista/{Page}");
+        }
+    }
+    void PreviousPage()
+    {
+        if (HasPrevious)
+        {
+            Page = _page - 1;
+            Navigation.NavigateTo($"tramites/lista/{Page}");
+        }
+    }
+
+    void Eliminar(int id)
+    {
+        CasoBaja.Ejecutar(id, _user);
+        OnInitialized();
+    }
 }
+
+<style>
+    .div-container {
+        background-color: #1f2937;
+        width: 75%;
+        padding: 1.3rem 2rem;
+        border-radius: 10px;
+    }
+
+    .nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0px auto;
+        padding: 0.5rem;
+        font-size: small;
+    }
+
+        .nav ul {
+            display: inline-flex;
+            align-items: stretch;
+            margin-left: 1rem;
+            margin-bottom: 0;
+            list-style: none;
+        }
+
+    .element {
+        display: flex;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        padding: 0.50rem 0.75rem;
+        margin-left: 0;
+        color: rgb(156, 163, 175);
+        background-color: #1f2937;
+        border: 1px solid rgb(55, 65, 81);
+    }
+
+        .element:hover {
+            color: white;
+            background-color: rgb(55, 65, 81);
+        }
+
+    .prev {
+        border-top-left-radius: 0.5rem;
+        border-bottom-left-radius: 0.5rem;
+    }
+
+    .num-selected {
+        color: white;
+        background-color: rgb(55, 65, 81);
+    }
+
+    .next {
+        border-top-right-radius: 0.5rem;
+        border-bottom-right-radius: 0.5rem;
+    }
+</style>

@@ -5,13 +5,13 @@
 @inject SesionActual Sesion
 <PageTitle>SGE | Expedientes</PageTitle>
 
-<form class="form">
+<form class="form" @onsubmit="() => Agregar(_e)">
     <p id="heading">Agregar Expediente</p>
     <div class="field">
-        <input class="input" placeholder="Caratula" @bind="e.Caratula">
+        <input class="input" placeholder="Caratula" @bind="_e.Caratula">
     </div>
     <div class="field">
-        <select class="input" @bind="strEstado">
+        <select class="input" @bind="_strEstado">
             <option value="" disabled selected>Seleccione un estado</option>
             <option>RecienIniciado</option>
             <option>ParaResolver</option>
@@ -21,35 +21,43 @@
         </select>
     </div>
     <div class="div-btn">
-        <button class="button" @onclick="() => Agregar(e)">Aceptar</button>
+        <button type="submit" class="button">Aceptar</button>
     </div>
 </form>
-<CuadroDialogo @ref=dialogo Mensaje=@error />
+<CuadroDialogo @ref=_dialogo Mensaje=@_error />
 
 
 @code {
-    [Parameter] public int Id { get; set; }
-    Expediente e = new();
-    string strEstado = "";
-    string error = "";
-    CuadroDialogo dialogo = null!;
+    CuadroDialogo _dialogo = null!;
+    Usuario _user = new();
+    Expediente _e = new();
+    string _strEstado = "";
+    string _error = "";
+
+    protected override void OnInitialized()
+    {
+        if (Sesion.User is not null)
+        {
+            _user = Sesion.User;
+        }
+    }
 
     void Agregar(Expediente e)
     {
         try
         {
-            e.Estado = (EstadoExpediente)Enum.Parse(typeof(EstadoExpediente), strEstado);
-            CasoAlta.Ejecutar(e, Sesion.User);
+            e.Estado = (EstadoExpediente)Enum.Parse(typeof(EstadoExpediente), _strEstado);
+            CasoAlta.Ejecutar(e, _user);
             Navigation.NavigateTo($"/expedientes/lista");
         }
         catch (Exception ex)
         {
-            error = ex.Message;
-            if (error == "Must specify valid information for parsing in the string. (Parameter 'value')")
+            _error = ex.Message;
+            if (_error == "Must specify valid information for parsing in the string. (Parameter 'value')")
             {
-                error = "Debe seleccionar un estado";
+                _error = "Debe seleccionar un estado";
             }
-            dialogo.Mostrar();
+            _dialogo.Mostrar();
         }
 
     }
@@ -109,7 +117,7 @@
         margin-top: 2.5em;
         padding: .375rem .75rem;
     }
-    
+
     .button {
         padding: 0.5em;
         padding-left: 1.1em;

@@ -1,5 +1,5 @@
 ﻿namespace SGE.Aplicacion;
-public class CasoDeuUsoExpedienteContarTotal(IExpedienteRepositorio repo)
+public class CasoDeUsoTramiteContarTotal(ITramiteRepositorio repo)
 {
     public int Ejecutar() => repo.ContarTotal();
 }

@@ -1,55 +1,58 @@
 ﻿@page "/expedientes/editar/{Id:int}"
 @rendermode InteractiveServer
-@inject CasoDeUsoExpedienteModificacion CasoDeUsoExpedienteModificacion
+@inject CasoDeUsoExpedienteModificacion CasoModificacion
 @inject CasoDeUsoExpedienteConsultaId ExpConsulta
 @inject CasoDeUsoUsuarioConsultaId UsuarioConsulta
 @inject NavigationManager Navigation
 @inject SesionActual Sesion
 <PageTitle>SGE | Expedientes</PageTitle>
 
-    <form class="form">
-        <p id="heading">Modificar Expediente #@e.Id</p>
-        <div class="field">
-            <input placeholder="Caratula" class="input" @bind="e.Caratula">
-        </div>
-        <div class="field">
-            <select class="input" @bind="strEstado">
-                <option value="" disabled selected>Seleccione un estado</option>
-                <option>RecienIniciado</option>
-                <option>ParaResolver</option>
-                <option>ConResolucion</option>
-                <option>EnNotificacion</option>
-                <option>Finalizado</option>
-            </select>
-        </div>
-        <div class="div-btn">
-            <button class="button" @onclick="() => Modificar(e)">Guardar cambios</button>
-        </div>
-    </form>
-    <CuadroDialogo @ref=dialogo Mensaje=@error />
+<form class="form" @onsubmit="() => Modificar(_e)">
+    <p id="heading">Modificar Expediente #@_e.Id</p>
+    <div class="field">
+        <input type="text" class="input" placeholder="Caratula" @bind="_e.Caratula">
+    </div>
+    <div class="field">
+        <select class="input" @bind="_strEstado">
+            <option value="" disabled selected>Seleccione un estado</option>
+            <option>RecienIniciado</option>
+            <option>ParaResolver</option>
+            <option>ConResolucion</option>
+            <option>EnNotificacion</option>
+            <option>Finalizado</option>
+        </select>
+    </div>
+    <div class="div-btn">
+        <button type="submit" class="button">Guardar cambios</button>
+    </div>
+</form>
+<CuadroDialogo @ref=_dialogo Mensaje=@_error />
 
 
 
 @code {
     [Parameter] public int Id { get; set; }
-    Usuario user = new();
-    string error = "";
-    Expediente e = new();
-    string strEstado = "";
-    CuadroDialogo dialogo = null!;
+    CuadroDialogo _dialogo = null!;
+    Usuario _user = new();
+    Expediente _e = new();
+    string _error = "";
+    string _strEstado = "";
 
     protected override void OnInitialized()
     {
         try
         {
-            // user = UsuarioConsulta.Ejecutar(Sesion.User.Id);
-            e = ExpConsulta.Ejecutar(Id);
-            e.Caratula = "";
+            if (Sesion.User is not null)
+            {
+                _user = Sesion.User;
+                _e = ExpConsulta.Ejecutar(Id);
+                _e.Caratula = "";
+            }
         }
         catch (Exception ex)
         {
-            error = ex.Message;
-            // Navigation.NavigateTo("/home");
+            _error = ex.Message;
+            _dialogo.Mostrar();
         }
     }
 
@@ -57,19 +60,21 @@
     {
         try
         {
-            e.Estado = (EstadoExpediente)Enum.Parse(typeof(EstadoExpediente), strEstado);
-            CasoDeUsoExpedienteModificacion.Ejecutar(e, Sesion.User);
-            Navigation.NavigateTo($"/expedientes/lista");
-            StateHasChanged();
+            e.Estado = (EstadoExpediente)Enum.Parse(typeof(EstadoExpediente), _strEstado);
+            CasoModificacion.Ejecutar(e, _user);
+            Navigation.NavigateTo("/expedientes/lista");
         }
         catch (Exception ex)
         {
-            error = ex.Message;
-            if (error == "Must specify valid information for parsing in the string. (Parameter 'value')")
+            if (ex.Message == "Must specify valid information for parsing in the string. (Parameter 'value')")
             {
-                error = "Debe seleccionar un estado";
+                _error = "Debe seleccionar un estado";
             }
-            dialogo.Mostrar();
+            else
+            {
+                _error = ex.Message;
+            }
+            _dialogo.Mostrar();
         }
     }
 }
