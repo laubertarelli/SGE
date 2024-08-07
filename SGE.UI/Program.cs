@@ -18,7 +18,6 @@ builder.Services
     .AddTransient<CasoDeUsoExpedienteModificacion>()
     .AddTransient<CasoDeUsoExpedienteListar>()
     .AddTransient<CasoDeUsoExpedienteConsultaId>()
-    .AddTransient<CasoDeUsoExpedienteConsultaTodos>()
     .AddTransient<CasoDeUsoExpedienteContarTotal>()
     // CASOS DE TRAMITE
     .AddTransient<CasoDeUsoTramiteAlta>()
@@ -26,6 +25,7 @@ builder.Services
     .AddTransient<CasoDeUsoTramiteModificacion>()
     .AddTransient<CasoDeUsoTramiteListar>()
     .AddTransient<CasoDeUsoTramiteContarTotal>()
+    .AddTransient<CasoDeUsoTramiteContarPorEtiqueta>()
     .AddTransient<CasoDeUsoTramiteConsultaEtiqueta>()
     .AddTransient<CasoDeUsoTramiteConsultaId>()
     .AddTransient<CasoDeUsoTramiteConsultaExpId>()
@@ -37,6 +37,7 @@ builder.Services
     .AddTransient<CasoDeUsoUsuarioModContraseña>()
     .AddTransient<CasoDeUsoUsuarioConsultaId>()
     .AddTransient<CasoDeUsoUsuarioListar>()
+    .AddTransient<CasoDeUsoUsuarioContarTotal>()
     .AddTransient<CasoDeUsoUsuarioOtorgarPermiso>()
     .AddTransient<CasoDeUsoUsuarioQuitarPermiso>()
     // VALIDADORES
@@ -52,6 +53,9 @@ builder.Services
     .AddScoped<IServicioActualizacionEstado, ServicioActualizacionEstado>()
     .AddScoped<IServicioHash, ServicioHash>()
     .AddScoped<IEspecificacionCambioEstado, EspecificacionCambioEstado>()
+    // CONTEXTO
+    .AddTransient<BaseContext>()
+    // SESION
     .AddSingleton<SesionActual>();
 
 var app = builder.Build();

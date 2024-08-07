@@ -1,43 +1,59 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/home">SGE</a>
-    </div>
+﻿@inject SesionActual Sesion
+
+<div>
+    <nav class="div-nav">
+        @if (Sesion.User is not null)
+        {
+            <ul class="nav-links">
+                <li><a href="/expedientes">Expedientes</a></li>
+                <li><a href="/tramites">Tramites</a></li>
+                @if (Sesion.User?.Id == 1)
+                {
+                    <li><a href="/usuarios">Usuarios</a></li>
+                }
+            </ul>
+            <a href="/cuenta"><button class="btn-header">Cuenta</button></a>
+        }
+    </nav>
 </div>
 
-@* <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="flex-column"> *@
-        @* <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                    class="bi bi-arrow-right-square-fill" viewBox="0 0 16 16">
-                    <path
-                        d="M0 14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2zm4.5-6.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5a.5.5 0 0 1 0-1" />
-                </svg>
-                Iniciar Sesion
-            </NavLink>
-        </div>
+<style>
+    .div-nav {
+        display: flex;
+        align-items: baseline;
+    }
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/signup" Match="NavLinkMatch.All">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                    class="bi bi-arrow-up-square-fill" viewBox="0 0 16 16">
-                    <path
-                        d="M2 16a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2zm6.5-4.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 1 0" />
-                </svg>
-                Registrarse
-            </NavLink>
-        </div> *@
+    .nav-links {
+        list-style: none;
+    }
 
-        @* <div class="nav-item px-3">
-        <NavLink class="nav-link" href="counter">
-        <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-        </NavLink>
-        </div>
-        <div class="nav-item px-3">
-        <NavLink class="nav-link" href="weather">
-        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-        </NavLink>
-        </div>
-        *@
-    @* </nav>
-</div> *@
+        .nav-links li {
+            display: inline-block;
+            padding: 0px 20px;
+            font-weight: 500;
+            font-size: 16px;
+            color: #edf0f1;
+            text-decoration: none;
+        }
+
+            .nav-links li a {
+                transition: all 0.3s ease 0;
+                font-weight: 500;
+                font-size: 16px;
+                color: #edf0f1;
+                text-decoration: none;
+            }
+
+    .btn-header {
+        margin-left: 20px;
+        padding: 9px 25px;
+        background-color: #2563EB;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 16px;
+        color: #edf0f1;
+        text-decoration: none;
+    }
+</style>

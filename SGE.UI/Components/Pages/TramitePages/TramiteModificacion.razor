@@ -1,4 +1,4 @@
-﻿@page "/tramitemodificacion"
+﻿@page "/tramites/editar/{Id:int}"
 @rendermode InteractiveServer
 @inject CasoDeUsoTramiteModificacion CasoModificacion
 @inject CasoDeUsoTramiteConsultaId CasoConsulta
@@ -6,75 +6,131 @@
 @inject SesionActual Sesion
 <PageTitle>SGE | Tramites</PageTitle>
 
-<h3>Modificacion de Tramite</h3>
-@if (!visible)
-{
-  <label class="mt-2" for="consid">ID a modificar:</label>
-  <input class="form-control" @bind="idTram" id="consid"><br>
-  <button class="btn btn-primary mt-2" @onclick="() => Consultar(idTram)">Buscar</button><br>
-}
-else
-{
-  <form>
-    <label class="mt-2" for="cont">Contenido:</label>
-    <input class="form-control" @bind="t.Contenido" id="cont">
-    <select class="form-control" @bind="strEtiqueta" id="etiq">
-      <option value="" disabled selected>Seleccione una etiqueta</option>
-      <option>EscritoPresentado</option>
-      <option>PaseAEstudio</option>
-      <option>Despacho</option>
-      <option>Resolucion</option>
-      <option>Notificacion</option>
-      <option>PaseAlArchivo</option>
-    </select><br>
-  </form>
-  <button class="btn btn-primary mt-2" @onclick="() => Modificar(t)">Guardar cambios</button><br>
-}
-<button class="btn btn-secondary mt-2" @onclick="Volver">Volver al menu</button>
-<br>
-@if (@error == "Value cannot be null. (Parameter 'value')")
-{
-  error = "Debe seleccionar una etiqueta";
-}
-<CuadroDialogo @ref=dialogo Mensaje=@error />
+<form class="form" @onsubmit="Modificar">
+    <p id="heading">Modificar Tramite #@_t.Id</p>
+    <div class="field">
+        <input type="text" class="input" placeholder="Contenido" @bind="_t.Contenido" @ref="_contenido">
+    </div>
+    <div class="field">
+        <select class="input" @bind="_t.Etiqueta" @ref="_strEtiqueta">
+            <option value="" disabled selected>Seleccione una etiqueta</option>
+            @foreach (EtiquetaTramite etiqueta in Enum.GetValues(typeof(EtiquetaTramite)))
+            {
+                <option>@etiqueta</option>
+            }
+        </select>
+    </div>
+    <div class="div-btn">
+        <button type="submit" class="button">Guardar cambios</button>
+    </div>
+</form>
+<CuadroDialogo @ref=_dialogo Mensaje=@_error />
 
 @code {
-  Tramite t = new();
-  string error = "";
-  int idTram;
-  bool visible = false;
-  string strEtiqueta = "";
-  CuadroDialogo dialogo = null!;
+    [Parameter] public int Id { get; set; }
+    CuadroDialogo _dialogo = null!;
+    Tramite _t = new();
+    string _error = "";
+    ElementReference _contenido;
+    ElementReference _strEtiqueta;
 
-  void Consultar(int idTram)
-  {
-    try
+    protected override void OnInitialized()
     {
-      t = CasoConsulta.Ejecutar(idTram);
-      visible = true;
-      error = "";
+        try
+        {
+            _t = CasoConsulta.Ejecutar(Id);
+        }
+        catch
+        {
+            Navigation.NavigateTo("/tramites");
+        }
     }
-    catch (Exception ex)
-    {
-      error = ex.Message;   
-      visible = false;
-      dialogo.Mostrar();
-    }
-  }
-  void Modificar(Tramite t)
-  {
-    try
-    {
-      t.Etiqueta = (EtiquetaTramite)Enum.Parse(typeof(EtiquetaTramite), strEtiqueta);
-      CasoModificacion.Ejecutar(t, Sesion.User);
-      Navigation.NavigateTo($"/tramitelistar");
-    }
-    catch (Exception ex)
-    {
-      error = ex.Message;
-      dialogo.Mostrar();
-    }
-  }
 
-  void Volver() => Navigation.NavigateTo($"/home");
+    void Modificar()
+    {
+        try
+        {
+            CasoModificacion.Ejecutar(_t, Sesion.User!);
+            Navigation.NavigateTo($"/tramites/{(int)Math.Ceiling(_t.Id / 5.0)}");
+        }
+        catch (Exception ex)
+        {
+            if (ex.Message == "Must specify valid information for parsing in the string. (Parameter 'value')")
+            {
+                _error = "Debe seleccionar un estado";
+            }
+            else
+            {
+                _error = ex.Message;
+            }
+            _dialogo.Mostrar();
+        }
+    }
 }
+
+<style>
+    .form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background-color: #1f2937;
+        width: 420px;
+        padding-left: 2em;
+        padding-right: 2em;
+        padding-bottom: 0.4em;
+        border-radius: 10px;
+    }
+
+    #heading {
+        text-align: center;
+        margin: 2em;
+        color: rgb(255, 255, 255);
+        font-size: 1.2em;
+    }
+
+    .field {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5em;
+        border-radius: 10px;
+        padding: 0.6em;
+        border: none;
+        outline: none;
+        color: white;
+        background-color: #374151;
+    }
+
+    .input {
+        background: none;
+        border: none;
+        outline: none;
+        width: 100%;
+        color: #d3d3d3;
+    }
+
+    option {
+        background-color: #374151;
+        color: #d3d3d3;
+        padding: 1rem;
+    }
+
+    .div-btn {
+        display: flex;
+        justify-content: center;
+        flex-direction: row;
+        margin-top: 2.5em;
+        padding: .375rem .75rem;
+    }
+
+    .button {
+        padding: 0.5em;
+        padding-left: 1.1em;
+        padding-right: 1.1em;
+        border-radius: 5px;
+        border: none;
+        outline: none;
+        background-color: #2563EB;
+        color: white;
+    }
+</style>

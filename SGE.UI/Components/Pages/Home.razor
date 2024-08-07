@@ -1,13 +1,16 @@
 ﻿@page "/home"
 <PageTitle>SGE | Home</PageTitle>
+@inherits LayoutComponentBase
 
 <div>
     <h2>Sistema de Gestión de Expedientes</h2>
     <h4>Características del Sistema</h4>
     <ul>
         <li>Posibilita la organización y administración efectiva de expedientes y trámites. Ambos elementos serán gestionados y persistidos de forma independiente.</li>
-        <li>Se establece una relación mediante la propiedad ExpedienteId en la clase Trámite, destinada a asociar un trámite a un expediente específico.</li>
         <li>Gestiona usuarios y sus respectivos permisos. Todos los usuarios tendrán acceso de lectura sobre ambas entidades.</li>
+        <li>
+            El primer usuario que se registre en el sistema será el Administrador, sólo él tendrá los permisos necesarios para listar, dar de baja y modificar cualquier usuario o sus permisos.
+        </li>
         <li>Para realizar altas, bajas o modificaciones será necesario contar con permisos explícitos.</li>
         <li>Realiza validaciones para evitar el ingreso de elementos que no cumplan con ciertos requisitos.</li>
     </ul>

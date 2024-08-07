@@ -1,6 +1,7 @@
-﻿@page "/expedientes/lista/{Page:int?}"
+﻿@page "/expedientes/{Page:int?}"
 @rendermode InteractiveServer
 @inject SesionActual Sesion
+@inject CasoDeUsoUsuarioConsultaId ConsultaUsuario
 @inject CasoDeUsoExpedienteContarTotal CasoContar
 @inject CasoDeUsoExpedienteListar CasoListar
 @inject CasoDeUsoExpedienteBaja CasoBaja
@@ -14,12 +15,10 @@
         <table class="table text-white p-2 text-center">
             <thead>
                 <tr>
-                    <th>#</th>
-                    <th>Caratula</th>
-                    <th>Estado</th>
+                    <th class="text-start"># - Carátula (Estado)</th>
+                    <th>Trámites</th>
+                    <th>Última Edición</th>
                     <th>Creado</th>
-                    <th>Ultima edición</th>
-                    <th>Usuario</th>
                     <th></th>
                 </tr>
             </thead>
@@ -27,19 +26,22 @@
                 @foreach (Expediente e in _expedientes)
                 {
                     <tr>
-                        <td>@e.Id</td>
-                        <td>@e.Caratula</td>
-                        <td>@e.Estado</td>
+                        <td class="text-start">#@e.Id - @e.Caratula<br>(@e.Estado)</td>
+                        <td>@e.Tramites.Count</td>
+                        <td>@GetName(e)<br>@e.FechayHoraMod</td>
                         <td>@e.FechayHoraCr</td>
-                        <td>@e.FechayHoraMod</td>
-                        <td>@e.IdUser</td>
-                        @if (_user.Id == 1)
-                        {
-                            <td>
-                                <button class="btn btn-primary" @onclick="() => Editar(e.Id)">Editar</button>
-                                <button class="btn btn-danger" @onclick="() => Eliminar(e.Id)">Eliminar</button>
-                            </td>
-                        }
+                        <td>
+                            <button class="btn btn-pencil" @onclick="() => Editar(e.Id)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+                                    <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z" />
+                                </svg>
+                            </button>
+                            <button class="btn btn-danger" @onclick="() => Eliminar(e.Id)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                    <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5" />
+                                </svg>
+                            </button>
+                        </td>
                     </tr>
                 }
             </tbody>
@@ -51,7 +53,9 @@
                 <ul>
                     <li>
                         <div class="element prev" href="#" @onclick="PreviousPage">
-                            <span>Ant</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrow-left-short" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5" />
+                            </svg>
                         </div>
                     </li>
                     @for (int i = 1; i <= Math.Min(_cantPages, 5); i++)
@@ -59,19 +63,21 @@
                         if (i == _page)
                         {
                             <li>
-                                <a class="element num-selected" href="@($"expedientes/lista/{i}")">@i</a>
+                                <a class="element num-selected" href="@($"expedientes/{i}")">@i</a>
                             </li>
                         }
                         else
                         {
                             <li>
-                                <a class="element" href="@($"expedientes/lista/{i}")">@i</a>
+                                <a class="element" href="@($"expedientes/{i}")">@i</a>
                             </li>
                         }
                     }
                     <li>
                         <div class="element next" href="#" @onclick="NextPage">
-                            <span>Sig</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrow-right-short" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8" />
+                            </svg>
                         </div>
                     </li>
                 </ul>
@@ -101,6 +107,7 @@
     bool HasNext => _page < _cantPages;
     void Agregar() => Navigation.NavigateTo("expedientes/agregar");
     void Editar(int id) => Navigation.NavigateTo($"expedientes/editar/{id}");
+    string GetName(Expediente e) => ConsultaUsuario.Ejecutar(e.IdUser).NombreCompleto;
 
     protected override void OnInitialized()
     {
@@ -124,11 +131,11 @@
         _page = Page ?? 1;
         if (_page < 1)
         {
-            Navigation.NavigateTo("expedientes/lista");
+            Navigation.NavigateTo("expedientes");
         }
         if (_cantPages > 0 && _page > _cantPages)
         {
-            Navigation.NavigateTo($"expedientes/lista/{_cantPages}");
+            Navigation.NavigateTo($"expedientes/{_cantPages}");
         }
         _expedientes = CasoListar.Ejecutar(_page);
     }
@@ -138,7 +145,7 @@
         if (HasNext)
         {
             Page = _page + 1;
-            Navigation.NavigateTo($"expedientes/lista/{Page}");
+            Navigation.NavigateTo($"expedientes/{Page}");
         }
     }
     void PreviousPage()
@@ -146,24 +153,39 @@
         if (HasPrevious)
         {
             Page = _page - 1;
-            Navigation.NavigateTo($"expedientes/lista/{Page}");
+            Navigation.NavigateTo($"expedientes/{Page}");
         }
     }
 
     void Eliminar(int id)
     {
-        CasoBaja.Ejecutar(id, _user);
-        OnInitialized();
+        try
+        {
+            CasoBaja.Ejecutar(id, _user);
+            OnInitialized();
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+            _dialogo.Mostrar();
+        }
     }
 }
-
 
 <style>
     .div-container {
         background-color: #1f2937;
-        width: 75%;
+        width: 65%;
         padding: 1.3rem 2rem;
         border-radius: 10px;
+    }
+
+    .btn {
+        padding: .275rem .65rem;
+    }
+
+    .btn-pencil {
+        background-color: #fd7e14;
     }
 
     .nav {
@@ -172,7 +194,6 @@
         align-items: center;
         margin: 0px auto;
         padding: 0.5rem;
-        font-size: small;
     }
 
         .nav ul {

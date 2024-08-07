@@ -1,15 +1,12 @@
-﻿@page "/auth/change-password"
+﻿@page "/usuarios/editar/{Id:int?}/password"
 @rendermode InteractiveServer
-@inject SesionActual Sesion
 @inject CasoDeUsoUsuarioModContraseña CasoModificacion
+@inject CasoDeUsoUsuarioConsultaId CasoConsulta
 @inject NavigationManager Navigation
-<PageTitle>SGE | Cuenta</PageTitle>
+<PageTitle>SGE | Change Password</PageTitle>
 
 <form class="form" @onsubmit="Cambiar">
-    <p id="heading">Cambiar Contraseña</p>
-    <div class="field">
-        <input type="password" class="input" placeholder="Ingresar contraseña actual" @bind="_password" />
-    </div>
+    <p id="heading">Change User #@_user.Id Password</p>
     <div class="field">
         <input type="password" class="input" placeholder="Ingresar nueva contraseña" @bind="_newPassword" />
     </div>
@@ -17,17 +14,30 @@
         <input type="password" class="input" placeholder="Repetir nueva contraseña" @bind="_repPassword" />
     </div>
     <div class="div-btn">
-        <button type="submit" class="button">Cambiar</button>
+        <button type="submit" class="button">Change</button>
     </div>
 </form>
 <CuadroDialogo @ref=_dialogo Mensaje=@_error />
 
 @code {
+    [Parameter] public int Id { get; set; }
     CuadroDialogo _dialogo = null!;
+    Usuario _user = new();
     string _error = "";
-    string _password = "";
     string _newPassword = "";
     string _repPassword = "";
+
+    protected override void OnInitialized()
+    {
+        try
+        {
+            _user = CasoConsulta.Ejecutar(Id);
+        }
+        catch
+        {
+            Navigation.NavigateTo($"/usuarios");
+        }
+    }
 
     void Cambiar()
     {
@@ -35,12 +45,10 @@
         {
             if (!_repPassword.Equals(_newPassword))
             {
-                _error = "Las contraseña no coinciden";
-                _dialogo.Mostrar();
-                return;
+                throw new Exception("Las contraseñas no coinciden");
             }
-            CasoModificacion.Ejecutar(Sesion.User!, _password, _newPassword);
-            Navigation.NavigateTo($"/cuenta");
+            CasoModificacion.Ejecutar(_user, _user.Contraseña, _newPassword);
+            Navigation.NavigateTo($"/usuarios/editar/{Id}");
         }
         catch (Exception ex)
         {

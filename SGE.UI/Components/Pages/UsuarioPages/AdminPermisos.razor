@@ -1,56 +1,48 @@
-﻿@page "/adminperm/{Id:int}"
+﻿@page "/usuarios/permisos/{Id:int}"
 @rendermode InteractiveServer
 @inject NavigationManager Navigation
 @inject CasoDeUsoUsuarioOtorgarPermiso OtorgarPermiso
 @inject CasoDeUsoUsuarioConsultaId UsuarioConsulta
 @inject CasoDeUsoUsuarioQuitarPermiso QuitarPermiso
-@inject SesionActual Sesion
 <PageTitle>SGE | Usuarios</PageTitle>
 
-@if (Sesion.User.Id == 1) 
-{
-<h3>Administrar permisos de @user.Nombre @user.Apellido</h3>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Permiso</th>
-            <th>Estado</th>
-            <th>Accion</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (Permiso p in permisos)
-        {
+<div class="div-container">
+    <p id="heading">Permisos de @_user.Nombre @_user.Apellido</p>
+    <table class="table text-white p-2 text-center">
+        <thead>
             <tr>
-                <td>@p</td>
-                <td>@GetEstado(p)</td>
-                <td>
-                    @if (EstaDisponible(p))
-                    {
-                        <button class="btn btn-danger" @onclick="() => Quitar(user.Id, p)">Eliminar</button>
-                    }
-                    else
-                    {
-                        <button class="btn btn-success" @onclick="() => Otorgar(user.Id, p)">Agregar</button>
-                    }
-                </td>
+                <th>Permiso</th>
+                <th>Accion</th>
             </tr>
-        }
-    </tbody>
-</table>
-}
-else
-{
-    <p>Necesita ser administrador para modificar permisos</p>
-}
-<button class="btn btn-secondary mt-2" @onclick="Volver">Volver al menu de gestion</button><br>
-@error
+        </thead>
+        <tbody>
+            @foreach (Permiso p in _permisos)
+            {
+                <tr>
+                    <td>@_user.GetPermisoParsed(p)</td>
+                    <td>
+                        @if (EstaDisponible(p))
+                        {
+                            <button class="btn btn-danger" @onclick="() => Quitar(p)">Quitar</button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-success" @onclick="() => Otorgar(p)">Otorgar</button>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<CuadroDialogo @ref="_dialogo" Mensaje=@_error />
 
 @code {
     [Parameter] public int Id { get; set; }
-    string error = "";
-    Usuario user = new();
-    List<Permiso> permisos = 
+    CuadroDialogo _dialogo = null!;
+    string _error = "";
+    Usuario _user = new();
+    List<Permiso> _permisos =
     [
         Permiso.ExpedienteAlta,
         Permiso.ExpedienteBaja,
@@ -64,7 +56,7 @@ else
     {
         try
         {
-            user = UsuarioConsulta.Ejecutar(Id);
+            _user = UsuarioConsulta.Ejecutar(Id);
         }
         catch
         {
@@ -72,28 +64,33 @@ else
         }
     }
 
-    private string GetEstado(Permiso p)
-    {
-        if (EstaDisponible(p))
-            return "Disponible";
-        return "No Disponible";
-    }
-    private bool EstaDisponible(Permiso p) => user.Permisos.Any(x => x == p);
+    bool EstaDisponible(Permiso p) => _user.Permisos.Any(x => x == p);
 
-    private void Quitar(int id, Permiso p)
+    void Quitar(Permiso p)
     {
-        QuitarPermiso.Ejecutar(id, p);
+        QuitarPermiso.Ejecutar(_user.Id, p);
         OnInitialized();
     }
 
-    private void Otorgar(int id, Permiso p)
+    void Otorgar(Permiso p)
     {
-        OtorgarPermiso.Ejecutar(id, p);
+        OtorgarPermiso.Ejecutar(_user.Id, p);
         OnInitialized();
-    }
-
-    private void Volver()
-    {
-        Navigation.NavigateTo($"/gestion");
     }
 }
+
+<style>
+    .div-container {
+        background-color: #1f2937;
+        width: 35%;
+        padding: 1.3rem 2rem;
+        border-radius: 10px;
+    }
+
+    #heading {
+        text-align: center;
+        margin: 1rem;
+        color: rgb(255, 255, 255);
+        font-size: 1.7em;
+    }
+</style>

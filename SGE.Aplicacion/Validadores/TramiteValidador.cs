@@ -9,10 +9,6 @@ public class TramiteValidador
         {
             msg += "El contenido no puede ser vacio \n";
         }
-        if (t.IdUser <= 0)
-        {
-            msg += "Id de usuario no valido \n";
-        }
         return msg == "";
     }
 }

@@ -8,9 +8,6 @@ public class CasoDeUsoExpedienteBaja(IExpedienteRepositorio repo, IServicioAutor
         {
             throw new AutorizacionException();
         }
-        else
-        {
-            repo.BajaExpediente(id);
-        }
+        repo.BajaExpediente(id);
     }
 }

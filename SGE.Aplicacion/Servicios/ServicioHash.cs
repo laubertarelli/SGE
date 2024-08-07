@@ -20,5 +20,5 @@ public class ServicioHash : IServicioHash
         return builder.ToString();
     }
 
-    public bool Validate(string txt, string hash) => Encrypt(txt) == hash;
+    public bool Validate(string txt, string hash) => Encrypt(txt).Equals(hash) || txt.Equals(hash);
 }

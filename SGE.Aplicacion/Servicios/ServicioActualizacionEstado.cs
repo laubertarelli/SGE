@@ -1,19 +1,18 @@
 ﻿namespace SGE.Aplicacion;
 
-public class ServicioActualizacionEstado(IExpedienteRepositorio repo, IEspecificacionCambioEstado espec) : IServicioActualizacionEstado
+public class ServicioActualizacionEstado(IExpedienteRepositorio repo, IEspecificacionCambioEstado espec, CasoDeUsoExpedienteConsultaId consulta) : IServicioActualizacionEstado
 {
-  public void ActualizarEstado(int id)
-  {
-    List<object> lista = repo.ConsultaTodos(id);
-    if (lista[^1] is Tramite t) // LAST INDEX
+    public void ActualizarEstado(int id)
     {
-      Expediente e = (Expediente)lista[0];
-      EstadoExpediente? nuevoEstado = espec.GetEstado(t.Etiqueta);
-      if (e != null && nuevoEstado != null)
-      {
-        e.Estado = nuevoEstado;
-        repo.ModificarExpediente(e);
-      }
+        Expediente e = consulta.Ejecutar(id);
+        if (e.Tramites.Count > 0)
+        {
+            EstadoExpediente? nuevoEstado = espec.GetEstado(e.Tramites[^1].Etiqueta);
+            if (nuevoEstado is not null)
+            {
+                e.Estado = nuevoEstado.Value;
+                repo.ModificarExpediente(e);
+            }
+        }
     }
-  }
 }

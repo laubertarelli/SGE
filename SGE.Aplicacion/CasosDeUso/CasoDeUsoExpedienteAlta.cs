@@ -8,19 +8,13 @@ public class CasoDeUsoExpedienteAlta(IExpedienteRepositorio repo, IServicioAutor
         {
             throw new AutorizacionException();
         }
-        else
+        if (!validador.EsValido(e, out string msg))
         {
-            e.IdUser = user.Id;
-            if (!validador.EsValido(e, out string msg))
-            {
-                throw new ValidacionException(msg);
-            }
-            else
-            {
-                e.FechayHoraCr = DateTime.Now;
-                e.FechayHoraMod = DateTime.Now;
-                repo.AltaExpediente(e);
-            }
+            throw new ValidacionException(msg);
         }
+        e.IdUser = user.Id;
+        e.FechayHoraCr = DateTime.Now;
+        e.FechayHoraMod = DateTime.Now;
+        repo.AltaExpediente(e);
     }
 }

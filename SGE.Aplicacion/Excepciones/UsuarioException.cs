@@ -1,6 +1,3 @@
 ﻿namespace SGE.Aplicacion;
 
-public class UsuarioException: Exception
-{
-    public UsuarioException(string msg): base(msg) {}
-}
+public class UsuarioException(string msg) : Exception(msg) { }

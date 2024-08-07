@@ -1,7 +1,3 @@
 ﻿namespace SGE.Aplicacion;
 
-public class ValidacionException: Exception
-{
-    public ValidacionException(string msg): base(msg) {}
-    //"La entidad no cumple con los requisitos exigidos";
-}
+public class ValidacionException(string msg) : Exception(msg) { }

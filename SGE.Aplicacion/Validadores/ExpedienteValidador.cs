@@ -9,10 +9,6 @@ public class ExpedienteValidador
         {
             msg += "La caratula no puede estar vacia \n";
         }
-        if (e.IdUser <= 0)
-        {
-            msg += "Id de usuario invalido \n";
-        }
         return msg == "";
     }
 }

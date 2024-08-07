@@ -1,59 +1,140 @@
-﻿@page "/tramitealta"
+﻿@page "/tramites/agregar"
 @rendermode InteractiveServer
 @inject CasoDeUsoTramiteAlta CasoAlta
+@inject CasoDeUsoExpedienteConsultaId ConsultaExp
 @inject NavigationManager Navigation
-@inject CasoDeUsoExpedienteConsultaId ConsultaIdExp
 @inject SesionActual Sesion
 <PageTitle>SGE | Tramites</PageTitle>
 
-<h3>Agregar Tramite</h3>
-<form>
-  <label class="mt-2" for="cont">Contenido: </label>
-  <input class="form-control" @bind="t.Contenido" id="cont">
-  <label class="mt-1" for="etiq">Etiqueta: </label>
-  <select class="form-control" @bind="strEtiqueta" id="etiq">
-    <option value="" disabled selected>Seleccione una etiqueta</option>
-    <option>EscritoPresentado</option>
-    <option>PaseAEstudio</option>
-    <option>Despacho</option>
-    <option>Resolucion</option>
-    <option>Notificacion</option>
-    <option>PaseAlArchivo</option>
-  </select>
-  <label class="mt-1" for="expid">Id del expediente asociado: </label>
-  <input class="form-control" @bind="t.ExpedienteId" id="expid"><br>
+<form class="form" @onsubmit="() => Agregar(_t)">
+    <p id="heading">Agregar Tramite</p>
+    <div class="field">
+        <input type="text" class="input" placeholder="# de expediente" @bind="_strId" />
+    </div>
+    <div class="field">
+        <input type="text" class="input" placeholder="Caratula" @bind="_t.Contenido" />
+    </div>
+    <div class="field">
+        <select class="input" @bind="_strEtiqueta">
+            <option value="" disabled selected>Seleccione una etiqueta</option>
+            @foreach (EtiquetaTramite etiqueta in Enum.GetValues(typeof(EtiquetaTramite)))
+            {
+                <option>@etiqueta</option>
+            }
+        </select>
+    </div>
+    <div class="div-btn">
+        <button type="submit" class="button">Aceptar</button>
+    </div>
 </form>
-<button class="btn btn-primary mt-2" @onclick="() => Agregar(t)">Aceptar</button><br>
-<button class="btn btn-secondary mt-2" @onclick="Volver">Volver al menu</button>
-<br>
-<CuadroDialogo @ref=dialogo Mensaje=@error />
+<CuadroDialogo @ref=_dialogo Mensaje=@_error />
 
 @code {
-  Tramite t = new();
-  string strEtiqueta = "";
-  string error = "";
-  Expediente exp = new();
-  CuadroDialogo dialogo = null!;
+    CuadroDialogo _dialogo = null!;
+    Usuario _user = new();
+    Tramite _t = new();
+    string _strId = "";
+    string _strEtiqueta = "";
+    string _error = "";
+    int _numId;
 
-  void Agregar(Tramite t)
-  {
-    try
+    protected override void OnInitialized()
     {
-      exp = ConsultaIdExp.Ejecutar(t.ExpedienteId);
-      t.Etiqueta = (EtiquetaTramite)Enum.Parse(typeof(EtiquetaTramite), strEtiqueta);
-      CasoAlta.Ejecutar(t, Sesion.User);
-      Navigation.NavigateTo($"/tramitelistar");
+        if (Sesion.User is not null)
+        {
+            _user = Sesion.User;
+        }
     }
-    catch (Exception ex)
-    {
-      error = ex.Message;
-      if (error == "Must specify valid information for parsing in the string. (Parameter 'value')")
-      {
-        error = "Debe seleccionar una etiqueta";
-      } 
-      dialogo.Mostrar();
-    }
-  }
 
-  void Volver() => Navigation.NavigateTo($"/home");
+    void Agregar(Tramite t)
+    {
+        try
+        {
+            _numId = Int32.Parse(_strId);
+            ConsultaExp.Ejecutar(_numId);
+            t.ExpedienteId = _numId;
+            t.Etiqueta = (EtiquetaTramite)Enum.Parse(typeof(EtiquetaTramite), _strEtiqueta);
+            CasoAlta.Ejecutar(t, _user);
+            Navigation.NavigateTo($"/tramites/{(int)Math.Ceiling(_t.Id / 5.0)}");
+        }
+        catch (Exception ex)
+        {
+            if (ex.Message == "Must specify valid information for parsing in the string. (Parameter 'value')")
+            {
+                _error = "Debe seleccionar una etiqueta";
+            }
+            else
+            {
+                _error = ex.Message;
+            }
+            _dialogo.Mostrar();
+        }
+    }
 }
+
+<style>
+    .form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background-color: #1f2937;
+        width: 420px;
+        padding-left: 2em;
+        padding-right: 2em;
+        padding-bottom: 0.4em;
+        border-radius: 10px;
+    }
+
+    #heading {
+        text-align: center;
+        margin: 2em;
+        color: rgb(255, 255, 255);
+        font-size: 1.2em;
+    }
+
+    .field {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5em;
+        border-radius: 10px;
+        padding: 0.6em;
+        border: none;
+        outline: none;
+        color: white;
+        background-color: #374151;
+    }
+
+    .input {
+        background: none;
+        border: none;
+        outline: none;
+        width: 100%;
+        color: #d3d3d3;
+    }
+
+    option {
+        background-color: #374151;
+        color: #d3d3d3;
+        padding: 1rem;
+    }
+
+    .div-btn {
+        display: flex;
+        justify-content: center;
+        flex-direction: row;
+        margin-top: 2.5em;
+        padding: .375rem .75rem;
+    }
+
+    .button {
+        padding: 0.5em;
+        padding-left: 1.1em;
+        padding-right: 1.1em;
+        border-radius: 5px;
+        border: none;
+        outline: none;
+        background-color: #2563EB;
+        color: white;
+    }
+</style>

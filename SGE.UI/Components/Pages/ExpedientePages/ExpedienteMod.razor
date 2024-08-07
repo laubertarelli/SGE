@@ -7,19 +7,18 @@
 @inject SesionActual Sesion
 <PageTitle>SGE | Expedientes</PageTitle>
 
-<form class="form" @onsubmit="() => Modificar(_e)">
+<form class="form" @onsubmit="Modificar">
     <p id="heading">Modificar Expediente #@_e.Id</p>
     <div class="field">
-        <input type="text" class="input" placeholder="Caratula" @bind="_e.Caratula">
+        <input type="text" class="input" placeholder="Caratula" @bind="_e.Caratula" @ref="_caratula">
     </div>
     <div class="field">
-        <select class="input" @bind="_strEstado">
+        <select class="input" @bind="_e.Estado" @ref="_strEstado">
             <option value="" disabled selected>Seleccione un estado</option>
-            <option>RecienIniciado</option>
-            <option>ParaResolver</option>
-            <option>ConResolucion</option>
-            <option>EnNotificacion</option>
-            <option>Finalizado</option>
+            @foreach (EstadoExpediente estado in Enum.GetValues(typeof(EstadoExpediente)))
+            {
+                <option>@estado</option>
+            }
         </select>
     </div>
     <div class="div-btn">
@@ -28,41 +27,32 @@
 </form>
 <CuadroDialogo @ref=_dialogo Mensaje=@_error />
 
-
-
 @code {
     [Parameter] public int Id { get; set; }
     CuadroDialogo _dialogo = null!;
-    Usuario _user = new();
     Expediente _e = new();
     string _error = "";
-    string _strEstado = "";
+    ElementReference _caratula;
+    ElementReference _strEstado;
 
     protected override void OnInitialized()
     {
         try
         {
-            if (Sesion.User is not null)
-            {
-                _user = Sesion.User;
-                _e = ExpConsulta.Ejecutar(Id);
-                _e.Caratula = "";
-            }
+            _e = ExpConsulta.Ejecutar(Id);
         }
-        catch (Exception ex)
+        catch
         {
-            _error = ex.Message;
-            _dialogo.Mostrar();
+            Navigation.NavigateTo("/expedientes");
         }
     }
 
-    void Modificar(Expediente e)
+    void Modificar()
     {
         try
         {
-            e.Estado = (EstadoExpediente)Enum.Parse(typeof(EstadoExpediente), _strEstado);
-            CasoModificacion.Ejecutar(e, _user);
-            Navigation.NavigateTo("/expedientes/lista");
+            CasoModificacion.Ejecutar(_e, Sesion.User!);
+            Navigation.NavigateTo($"/expedientes/{(int)Math.Ceiling(_e.Id / 5.0)}");
         }
         catch (Exception ex)
         {

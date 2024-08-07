@@ -1,0 +1,244 @@
+﻿@page "/usuarios/{Page:int?}"
+@rendermode InteractiveServer
+@inject CasoDeUsoUsuarioContarTotal CasoContar
+@inject CasoDeUsoUsuarioListar CasoListar
+@inject CasoDeUsoUsuarioConsultaId CasoConsulta
+@inject CasoDeUsoUsuarioEliminar CasoBaja
+@inject NavigationManager Navigation
+@inject SesionActual Sesion
+<PageTitle>SGE | Usuarios</PageTitle>
+
+<div class="div-container">
+    <table class="table text-white p-2 text-center">
+        <thead>
+            <tr>
+                <th class="text-start">ID</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Email</th>
+                <th>Creado</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Usuario u in _usuarios)
+            {
+                <tr>
+                    <td class="text-start">@u.Id</td>
+                    <td>@u.Nombre</td>
+                    <td>@u.Apellido</td>
+                    <td>@u.Email</td>
+                    <td>@u.FechayHoraCr</td>
+                    <td>
+                        @if (u.Id == 1)
+                        {
+                            <p class="mb-0">Administrador</p>                            
+                        }
+                        else
+                        {
+                            <button class="btn btn-pencil" @onclick="() => Editar(u.Id)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+                                    <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z" />
+                                </svg>
+                            </button>
+                            <button class="btn btn-success" @onclick="() => Permisos(u.Id)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-shield-fill-plus" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M8 0c-.69 0-1.843.265-2.928.56-1.11.3-2.229.655-2.887.87a1.54 1.54 0 0 0-1.044 1.262c-.596 4.477.787 7.795 2.465 9.99a11.8 11.8 0 0 0 2.517 2.453c.386.273.744.482 1.048.625.28.132.581.24.829.24s.548-.108.829-.24a7 7 0 0 0 1.048-.625 11.8 11.8 0 0 0 2.517-2.453c1.678-2.195 3.061-5.513 2.465-9.99a1.54 1.54 0 0 0-1.044-1.263 63 63 0 0 0-2.887-.87C9.843.266 8.69 0 8 0m-.5 5a.5.5 0 0 1 1 0v1.5H10a.5.5 0 0 1 0 1H8.5V9a.5.5 0 0 1-1 0V7.5H6a.5.5 0 0 1 0-1h1.5z" />
+                                </svg>
+                            </button>
+                            <button class="btn btn-danger" @onclick="() => Eliminar(u.Id)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                    <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5" />
+                                </svg>
+                            </button>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <nav class="nav">
+        <span>Mostrando @(_cantUsuarios > 0 ? ((_page - 1) * 5) + 1 : "0") - @((_page * 5) < _cantUsuarios ? _page * 5 : _cantUsuarios) de @_cantUsuarios</span>
+        @if (_cantPages > 1)
+        {
+            <ul>
+                <li>
+                    <div class="element prev" href="#" @onclick="PreviousPage">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrow-left-short" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5" />
+                        </svg>
+                    </div>
+                </li>
+                @for (int i = 1; i <= Math.Min(_cantPages, 5); i++)
+                {
+                    if (i == _page)
+                    {
+                        <li>
+                            <a class="element num-selected" href="@($"usuarios/{i}")">@i</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li>
+                            <a class="element" href="@($"usuarios/{i}")">@i</a>
+                        </li>
+                    }
+                }
+                <li>
+                    <div class="element next" href="#" @onclick="NextPage">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrow-right-short" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8" />
+                        </svg>
+                    </div>
+                </li>
+            </ul>
+        }
+    </nav>
+</div>
+<CuadroDialogo @ref="_dialogo" Mensaje=@_error />
+
+@code {
+    [Parameter] public int? Page { get; set; } = 1;
+    CuadroDialogo _dialogo = null!;
+    Usuario _user = new();
+    List<Usuario> _usuarios = [];
+    string _error = "";
+    int _page;
+    int _cantPages;
+    int _cantUsuarios;
+
+    bool HasPrevious => _page > 1;
+    bool HasNext => _page < _cantPages;
+    void Editar(int id) => Navigation.NavigateTo($"usuarios/editar/{id}");
+    void Permisos(int id) => Navigation.NavigateTo($"usuarios/permisos/{id}");
+
+    protected override void OnInitialized()
+    {
+        if (Sesion.User is not null)
+        {
+            _user = Sesion.User;
+            Init();
+        }
+    }
+
+    void Init()
+    {
+        _cantUsuarios = CasoContar.Ejecutar();
+        _cantPages = (int)Math.Ceiling(_cantUsuarios / 5.0);
+        _page = Page ?? 1;
+        _usuarios = CasoListar.Ejecutar(_page);
+    }
+
+    protected override void OnParametersSet()
+    {
+        _page = Page ?? 1;
+        if (_page < 1)
+        {
+            Navigation.NavigateTo("usuarios");
+        }
+        if (_cantPages > 0 && _page > _cantPages)
+        {
+            Navigation.NavigateTo($"usuarios/{_cantPages}");
+        }
+        _usuarios = CasoListar.Ejecutar(_page);
+    }
+
+    void NextPage()
+    {
+        if (HasNext)
+        {
+            Page = _page + 1;
+            Navigation.NavigateTo($"usuarios/{Page}");
+        }
+    }
+    void PreviousPage()
+    {
+        if (HasPrevious)
+        {
+            Page = _page - 1;
+            Navigation.NavigateTo($"usuarios/{Page}");
+        }
+    }
+
+    void Eliminar(int id)
+    {
+        try
+        {
+            CasoBaja.Ejecutar(id);
+            OnInitialized();
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+            _dialogo.Mostrar();
+        }
+    }
+}
+
+<style>
+    .div-container {
+        background-color: #1f2937;
+        width: 70%;
+        padding: 1.3rem 2rem;
+        border-radius: 10px;
+    }
+
+    .btn {
+        padding: .275rem .65rem;
+    }
+
+    .btn-pencil {
+        background-color: #fd7e14;
+    }
+
+    .nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0px auto;
+        padding: 0.5rem;
+    }
+
+        .nav ul {
+            display: inline-flex;
+            align-items: stretch;
+            margin-left: 1rem;
+            margin-bottom: 0;
+            list-style: none;
+        }
+
+    .element {
+        display: flex;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        padding: 0.50rem 0.75rem;
+        margin-left: 0;
+        color: rgb(156, 163, 175);
+        background-color: #1f2937;
+        border: 1px solid rgb(55, 65, 81);
+    }
+
+        .element:hover {
+            color: white;
+            background-color: rgb(55, 65, 81);
+        }
+
+    .prev {
+        border-top-left-radius: 0.5rem;
+        border-bottom-left-radius: 0.5rem;
+    }
+
+    .num-selected {
+        color: white;
+        background-color: rgb(55, 65, 81);
+    }
+
+    .next {
+        border-top-right-radius: 0.5rem;
+        border-bottom-right-radius: 0.5rem;
+    }
+</style>

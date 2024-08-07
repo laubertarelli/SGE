@@ -1,66 +1,32 @@
 ﻿using SGE.Aplicacion;
 namespace SGE.Repositorios;
 
-public class RepositorioTramite : ITramiteRepositorio
+public class RepositorioTramite(BaseContext context) : ITramiteRepositorio
 {
     public void AltaTramite(Tramite t)
     {
-        using var context = new BaseContext();
         context.Tramites.Add(t);
         context.SaveChanges();
     }
 
     public void BajaTramite(int id)
     {
-        using var context = new BaseContext();
-        Tramite? t = context.Tramites.Where(t => t.Id == id).SingleOrDefault();
-        if (t != null)
-        {
-            context.Tramites.Remove(t);
-        }
+        Tramite t = context.Tramites.Where(t => t.Id == id).Single();
+        context.Tramites.Remove(t);
         context.SaveChanges();
     }
 
-    public void ModificacionTramite(Tramite nuevoT)
+    public void ModificacionTramite(Tramite t)
     {
-        using var context = new BaseContext();
-        Tramite? t = context.Tramites.Where(t => t.Id == nuevoT.Id).SingleOrDefault();
-        if (t != null)
-        {
-            t.Contenido = nuevoT.Contenido;
-            t.Etiqueta = nuevoT.Etiqueta;
-        }
+        context.Tramites.Update(t);
         context.SaveChanges();
     }
 
-    public List<Tramite> ListarTramites(int page)
-    {
-        using var context = new BaseContext();
-        return context.Tramites.Skip((page - 1) * 5).Take(5).ToList();
-    }
-
-    public int ContarTotal()
-    {
-        using var context = new BaseContext();
-        return context.Tramites.Count();
-    }
-
-    public List<Tramite> ConsultaPorEtiqueta(EtiquetaTramite e)
-    {
-        using var context = new BaseContext();
-        return context.Tramites.Where(t => t.Etiqueta == e).ToList();
-    }
-
-    public Tramite? ConsultaPorId(int id)
-    {
-        using var context = new BaseContext();
-        return context.Tramites.Where(t => t.Id == id).SingleOrDefault();
-    }
-
-    public List<Tramite> ConsultaPorExpedienteId(int expId)
-    {
-        using var context = new BaseContext();
-        return context.Tramites.Where(t => t.ExpedienteId == expId).ToList();
-    }
+    public List<Tramite> ListarTramites(int page) => context.Tramites.Skip((page - 1) * 5).Take(5).ToList();
+    public int ContarTotal() => context.Tramites.Count();
+    public int ContarPorEtiqueta(EtiquetaTramite e) => context.Tramites.Where(t => t.Etiqueta == e).Count();
+    public List<Tramite> ConsultaPorEtiqueta(EtiquetaTramite e, int page) => context.Tramites.Where(t => t.Etiqueta == e).Skip((page - 1) * 5).Take(5).ToList();
+    public Tramite? ConsultaPorId(int id) => context.Tramites.Where(t => t.Id == id).SingleOrDefault();
+    public List<Tramite> ConsultaPorExpedienteId(int expId) => context.Tramites.Where(t => t.ExpedienteId == expId).ToList();
 
 }

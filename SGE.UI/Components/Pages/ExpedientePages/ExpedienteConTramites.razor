@@ -1,7 +1,6 @@
 ﻿@page "/exptramlistar"
 @rendermode InteractiveServer
 @inject CasoDeUsoUsuarioConsultaId UsuarioConsulta
-@inject CasoDeUsoExpedienteConsultaTodos ConsultaTodos
 @inject NavigationManager Navigation
 <h3>Expediente y Tramites</h3>
 
@@ -90,7 +89,6 @@ else
     {
         try
         {
-            lista = ConsultaTodos.Ejecutar(idExp);
             e = (Expediente)lista[0];
             visible = true;
         }

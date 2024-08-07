@@ -7,17 +7,17 @@
 
 <form class="form">
     <p id="heading">Datos Personales</p>
-    <div class="field">
-        <input class="input" type="text" placeholder="Nombre" @bind="_user.Nombre" />
-    </div>
-    <div class="field">
-        <input class="input" type="text" placeholder="Apellido" @bind="_user.Apellido" />
-    </div>
-    <div class="field">
-        <input class="input" type="text" placeholder="Email" @bind="_email" />
-    </div>
     @if (!_editar)
     {
+        <div class="field">
+            <input readonly class="input" type="text" placeholder="Nombre" @bind="_user.Nombre" />
+        </div>
+        <div class="field">
+            <input readonly class="input" type="text" placeholder="Apellido" @bind="_user.Apellido" />
+        </div>
+        <div class="field">
+            <input readonly class="input" type="text" placeholder="Email" @bind="_user.Email" />
+        </div>
         <div class="div-toggle">
             <button type="button" class="button" @onclick="Toggle">Modificar datos</button>
         </div>
@@ -25,10 +25,19 @@
     else
     {
         <div class="field">
+            <input class="input" type="text" placeholder="Nombre" @bind="_nombre" />
+        </div>
+        <div class="field">
+            <input class="input" type="text" placeholder="Apellido" @bind="_apellido" />
+        </div>
+        <div class="field">
+            <input class="input" type="text" placeholder="Email" @bind="_email" />
+        </div>
+        <div class="field">
             <input class="input" type="password" placeholder="Confirmar contraseña" @bind="_password" />
         </div>
         <div class="div-btn">
-            <button type="button" class="button" @onclick="() => Editar(_user)">Guardar cambios</button>
+            <button type="button" class="button" @onclick="Editar">Guardar cambios</button>
         </div>
     }
     <div class="div-btn">
@@ -42,11 +51,14 @@
     Usuario _user = new();
     CuadroDialogo _dialogo = null!;
     string _error = "";
+    string _nombre = "";
+    string _apellido = "";
     string _email = "";
     string _password = "";
     bool _editar = false;
+
     void Toggle() => _editar = !_editar;
-    void CambiarContraseña() => Navigation.NavigateTo("cuenta/editar");
+    void CambiarContraseña() => Navigation.NavigateTo($"auth/change-password");
 
     protected override void OnInitialized()
     {
@@ -55,6 +67,8 @@
             if (Sesion.User is not null)
             {
                 _user = Sesion.User;
+                _nombre = _user.Nombre;
+                _apellido = _user.Apellido;
                 _email = _user.Email;
             }
         }
@@ -65,11 +79,11 @@
         }
     }
 
-    void Editar(Usuario user)
+    void Editar()
     {
         try
         {
-            CasoModificacion.Ejecutar(_user, _email, _password);
+            CasoModificacion.Ejecutar(_user, _password);
             Toggle();
             _password = "";
         }
@@ -82,7 +96,7 @@
 
     void CerrarSesion()
     {
-        Sesion.CerrarSesion();
+        Sesion.User = null;
         Navigation.NavigateTo("/");
     }
 }

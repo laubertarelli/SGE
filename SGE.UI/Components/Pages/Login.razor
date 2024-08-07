@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@page "/login"
 @rendermode InteractiveServer
 @inject CasoDeUsoUsuarioLogin CasoLogin
 @inject NavigationManager Navigation
@@ -28,17 +28,18 @@
 <CuadroDialogo @ref=dialogo Mensaje=@error />
 
 @code {
-    string email = "";
-    string pass = "";
-    string error = "";
-    CuadroDialogo dialogo = null!;
+	string email = "";
+	string pass = "";
+	string error = "";
+	CuadroDialogo dialogo = null!;
 
-    void Ingresar()
-    {
-        try
-        {
-            Sesion.User = CasoLogin.Ejecutar(email, pass);
-            Navigation.NavigateTo($"/home", true);
+	void Ingresar()
+	{
+		try
+		{
+			Sesion.User = CasoLogin.Ejecutar(email, pass);
+			Console.WriteLine($"Al hacer el login: User ID = {Sesion.User.Id}");
+			Navigation.NavigateTo("/home");
         }
         catch (Exception ex)
         {

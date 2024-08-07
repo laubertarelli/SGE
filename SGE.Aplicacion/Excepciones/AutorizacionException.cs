@@ -1,7 +1,3 @@
 ﻿namespace SGE.Aplicacion;
 
-public class AutorizacionException : Exception 
-{
-    public AutorizacionException(string msg = "No se tienen los permisos necesarios"): base(msg) {}
-    //"No se tienen los permisos necesarios";
-}
+public class AutorizacionException(string msg = "No tiene los permisos necesarios") : Exception(msg) { }

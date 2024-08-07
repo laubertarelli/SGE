@@ -8,18 +8,12 @@ public class CasoDeUsoExpedienteModificacion(IExpedienteRepositorio repo, IServi
         {
             throw new AutorizacionException();
         }
-        else
+        if (!validador.EsValido(e, out string msg))
         {
-            e.IdUser = user.Id;
-            if (!validador.EsValido(e, out string msg))
-            {
-                throw new ValidacionException(msg);
-            }
-            else
-            {
-                e.FechayHoraMod = DateTime.Now;
-                repo.ModificarExpediente(e);
-            }
+            throw new ValidacionException(msg);
         }
+        e.IdUser = user.Id;
+        e.FechayHoraMod = DateTime.Now;
+        repo.ModificarExpediente(e);
     }
 }

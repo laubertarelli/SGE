@@ -7,11 +7,11 @@ public class CasoDeUsoUsuarioLogin(IUsuarioRepositorio repoUser, IServicioHash h
         Usuario? user = repoUser.GetUsuario(email);
         if (user is null)
         {
-            throw new UsuarioException("El email ingresado no existe");
+            throw new UsuarioException("Email incorrecto");
         }
         if (!hashing.Validate(pass, user.Contraseña))
         {
-            throw new UsuarioException("La contraseña ingresada es incorrecta");
+            throw new UsuarioException("Contraseña incorrecta");
         }
         return user;
     }

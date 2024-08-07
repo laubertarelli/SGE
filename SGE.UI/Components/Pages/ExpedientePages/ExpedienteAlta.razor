@@ -13,11 +13,10 @@
     <div class="field">
         <select class="input" @bind="_strEstado">
             <option value="" disabled selected>Seleccione un estado</option>
-            <option>RecienIniciado</option>
-            <option>ParaResolver</option>
-            <option>ConResolucion</option>
-            <option>EnNotificacion</option>
-            <option>Finalizado</option>
+            @foreach (EstadoExpediente estado in Enum.GetValues(typeof(EstadoExpediente)))
+            {
+                <option>@estado</option>
+            }
         </select>
     </div>
     <div class="div-btn">
@@ -25,7 +24,6 @@
     </div>
 </form>
 <CuadroDialogo @ref=_dialogo Mensaje=@_error />
-
 
 @code {
     CuadroDialogo _dialogo = null!;
@@ -48,14 +46,17 @@
         {
             e.Estado = (EstadoExpediente)Enum.Parse(typeof(EstadoExpediente), _strEstado);
             CasoAlta.Ejecutar(e, _user);
-            Navigation.NavigateTo($"/expedientes/lista");
+            Navigation.NavigateTo($"/expedientes/{(int)Math.Ceiling(_e.Id / 5.0)}");
         }
         catch (Exception ex)
         {
-            _error = ex.Message;
-            if (_error == "Must specify valid information for parsing in the string. (Parameter 'value')")
+            if (ex.Message == "Must specify valid information for parsing in the string. (Parameter 'value')")
             {
                 _error = "Debe seleccionar un estado";
+            }
+            else
+            {
+                _error = ex.Message;
             }
             _dialogo.Mostrar();
         }
