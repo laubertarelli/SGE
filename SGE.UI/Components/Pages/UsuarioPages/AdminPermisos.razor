@@ -8,7 +8,7 @@
 
 <div class="div-container">
     <p id="heading">Permisos de @_user.Nombre @_user.Apellido</p>
-    <table class="table text-white p-2 text-center">
+    <table class="table text-white p-2">
         <thead>
             <tr>
                 <th>Permiso</th>
@@ -23,7 +23,7 @@
                     <td>
                         @if (EstaDisponible(p))
                         {
-                            <button class="btn btn-danger" @onclick="() => Quitar(p)">Quitar</button>
+                            <button class="btn btn-danger quitar" @onclick="() => Quitar(p)">Quitar</button>
                         }
                         else
                         {
@@ -91,6 +91,10 @@
         text-align: center;
         margin: 1rem;
         color: rgb(255, 255, 255);
-        font-size: 1.7em;
+        font-size: 1.2rem;
+    }
+
+    .quitar {
+        width: 88px;
     }
 </style>

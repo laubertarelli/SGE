@@ -26,6 +26,7 @@ builder.Services
     .AddTransient<CasoDeUsoTramiteListar>()
     .AddTransient<CasoDeUsoTramiteContarTotal>()
     .AddTransient<CasoDeUsoTramiteContarPorEtiqueta>()
+    .AddTransient<CasoDeUsoTramiteContarPorExpId>()
     .AddTransient<CasoDeUsoTramiteConsultaEtiqueta>()
     .AddTransient<CasoDeUsoTramiteConsultaId>()
     .AddTransient<CasoDeUsoTramiteConsultaExpId>()
@@ -41,18 +42,18 @@ builder.Services
     .AddTransient<CasoDeUsoUsuarioOtorgarPermiso>()
     .AddTransient<CasoDeUsoUsuarioQuitarPermiso>()
     // VALIDADORES
-    .AddScoped<ExpedienteValidador>()
-    .AddScoped<TramiteValidador>()
-    .AddScoped<UsuarioValidador>()
+    .AddTransient<ExpedienteValidador>()
+    .AddTransient<TramiteValidador>()
+    .AddTransient<UsuarioValidador>()
     // REPOSITORIOS
-    .AddScoped<IUsuarioRepositorio, RepositorioUsuarios>()
-    .AddScoped<IExpedienteRepositorio, RepositorioExpediente>()
-    .AddScoped<ITramiteRepositorio, RepositorioTramite>()
+    .AddTransient<IUsuarioRepositorio, RepositorioUsuarios>()
+    .AddTransient<IExpedienteRepositorio, RepositorioExpediente>()
+    .AddTransient<ITramiteRepositorio, RepositorioTramite>()
     // SERVICIOS
-    .AddScoped<IServicioAutorizacion, ServicioAutorizacion>()
-    .AddScoped<IServicioActualizacionEstado, ServicioActualizacionEstado>()
-    .AddScoped<IServicioHash, ServicioHash>()
-    .AddScoped<IEspecificacionCambioEstado, EspecificacionCambioEstado>()
+    .AddTransient<IServicioAutorizacion, ServicioAutorizacion>()
+    .AddTransient<IServicioActualizacionEstado, ServicioActualizacionEstado>()
+    .AddTransient<IServicioHash, ServicioHash>()
+    .AddTransient<IEspecificacionCambioEstado, EspecificacionCambioEstado>()
     // CONTEXTO
     .AddTransient<BaseContext>()
     // SESION

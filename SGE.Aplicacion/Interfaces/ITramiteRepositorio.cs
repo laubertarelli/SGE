@@ -8,7 +8,8 @@ public interface ITramiteRepositorio
     public List<Tramite> ListarTramites(int page);
     public int ContarTotal();
     public int ContarPorEtiqueta(EtiquetaTramite etiqueta);
+    public int ContarPorExpId(int expId);
     public List<Tramite> ConsultaPorEtiqueta(EtiquetaTramite etiqueta, int page);
     public Tramite? ConsultaPorId(int id);
-    public List<Tramite> ConsultaPorExpedienteId(int expId);
+    public List<Tramite> ConsultaPorExpId(int expId, int page);
 }

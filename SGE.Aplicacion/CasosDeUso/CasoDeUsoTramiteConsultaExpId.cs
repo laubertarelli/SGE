@@ -1,9 +1,6 @@
 ﻿namespace SGE.Aplicacion;
 
-public class CasoDeUsoTramiteConsultaExpId(ITramiteRepositorio repoTram)
+public class CasoDeUsoTramiteConsultaExpId(ITramiteRepositorio repo)
 {
-  public List<Tramite> Ejecutar(int expId)
-  {
-    return repoTram.ConsultaPorExpedienteId(expId);
-  }
+    public List<Tramite> Ejecutar(int expId, int page) => repo.ConsultaPorExpId(expId, page);
 }

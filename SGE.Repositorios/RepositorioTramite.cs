@@ -25,8 +25,9 @@ public class RepositorioTramite(BaseContext context) : ITramiteRepositorio
     public List<Tramite> ListarTramites(int page) => context.Tramites.Skip((page - 1) * 5).Take(5).ToList();
     public int ContarTotal() => context.Tramites.Count();
     public int ContarPorEtiqueta(EtiquetaTramite e) => context.Tramites.Where(t => t.Etiqueta == e).Count();
+    public int ContarPorExpId(int expId) => context.Tramites.Where(t => t.ExpedienteId == expId).Count();
     public List<Tramite> ConsultaPorEtiqueta(EtiquetaTramite e, int page) => context.Tramites.Where(t => t.Etiqueta == e).Skip((page - 1) * 5).Take(5).ToList();
     public Tramite? ConsultaPorId(int id) => context.Tramites.Where(t => t.Id == id).SingleOrDefault();
-    public List<Tramite> ConsultaPorExpedienteId(int expId) => context.Tramites.Where(t => t.ExpedienteId == expId).ToList();
+    public List<Tramite> ConsultaPorExpId(int expId, int page) => context.Tramites.Where(t => t.ExpedienteId == expId).Skip((page - 1) * 5).Take(5).ToList();
 
 }

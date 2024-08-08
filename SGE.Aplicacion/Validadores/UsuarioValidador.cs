@@ -15,11 +15,11 @@ public class UsuarioValidador
         }
         if (user.Email == "")
         {
-            msg += "El Email no puede ser vacio ||\n";
+            msg += "El email no puede estar vacio ||\n";
         }
-        if (user.Contraseña == "")
+        if (user.Contraseña.Length < 8)
         {
-            msg += "La contraseña no puede ser vacia";
+            msg += "La contraseña no puede tener menos de 8 carácteres";
         }
         return msg == "";
     }

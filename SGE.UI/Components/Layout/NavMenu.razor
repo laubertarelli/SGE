@@ -7,7 +7,7 @@
             <ul class="nav-links">
                 <li><a href="/expedientes">Expedientes</a></li>
                 <li><a href="/tramites">Tramites</a></li>
-                @if (Sesion.User?.Id == 1)
+                @if (Sesion.User.IsAdmin)
                 {
                     <li><a href="/usuarios">Usuarios</a></li>
                 }

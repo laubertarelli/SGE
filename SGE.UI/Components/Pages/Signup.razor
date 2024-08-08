@@ -13,7 +13,7 @@
         <input class="input" type="text" placeholder="Apellido" @bind="u.Apellido" />
     </div>
     <div class="field">
-        <input class="input" type="text" placeholder="Email" @bind="u.Email" />
+        <input class="input" type="email" placeholder="Email" @bind="u.Email" />
     </div>
     <div class="field">
         <input class="input" type="password" placeholder="Contraseña" @bind="u.Contraseña" />
@@ -39,7 +39,7 @@
         {
             if (!_repPassword.Equals(u.Contraseña))
             {
-                error = "La contraseña no coincide";
+                error = "Las contraseñas no coinciden";
                 dialogo.Mostrar();
                 return;
             }

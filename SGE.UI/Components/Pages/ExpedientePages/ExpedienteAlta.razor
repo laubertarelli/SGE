@@ -27,25 +27,16 @@
 
 @code {
     CuadroDialogo _dialogo = null!;
-    Usuario _user = new();
     Expediente _e = new();
     string _strEstado = "";
     string _error = "";
-
-    protected override void OnInitialized()
-    {
-        if (Sesion.User is not null)
-        {
-            _user = Sesion.User;
-        }
-    }
 
     void Agregar(Expediente e)
     {
         try
         {
             e.Estado = (EstadoExpediente)Enum.Parse(typeof(EstadoExpediente), _strEstado);
-            CasoAlta.Ejecutar(e, _user);
+            CasoAlta.Ejecutar(e, Sesion.User!);
             Navigation.NavigateTo($"/expedientes/{(int)Math.Ceiling(_e.Id / 5.0)}");
         }
         catch (Exception ex)

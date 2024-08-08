@@ -105,7 +105,6 @@
 @code {
     [Parameter] public int? Page { get; set; } = 1;
     CuadroDialogo _dialogo = null!;
-    Usuario _user = new();
     List<Tramite> _tramites = [];
     string _error = "";
     int _page;
@@ -116,18 +115,19 @@
     bool HasNext => _page < _cantPages;
     void Agregar() => Navigation.NavigateTo("tramites/agregar");
     void Editar(int id) => Navigation.NavigateTo($"tramites/editar/{id}");
-    string GetName(Tramite t) => ConsultaUsuario.Ejecutar(t.IdUser).NombreCompleto;
-
-    protected override void OnInitialized()
+    string GetName(Tramite t)
     {
-        if (Sesion.User is not null)
+        try
         {
-            _user = Sesion.User;
-            Init();
+            return ConsultaUsuario.Ejecutar(t.IdUser).NombreCompleto;
+        }
+        catch
+        {
+            return "Usuario no encontrado";
         }
     }
 
-    void Init()
+    protected override void OnInitialized()
     {
         _page = Page ?? 1;
         _cantTramites = CasoContar.Ejecutar();
@@ -170,7 +170,7 @@
     {
         try
         {
-            CasoBaja.Ejecutar(id, _user);
+            CasoBaja.Ejecutar(id, Sesion.User!);
             OnInitialized();
         }
         catch (Exception ex)
