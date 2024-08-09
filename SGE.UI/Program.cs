@@ -2,7 +2,6 @@ using SGE.Aplicacion;
 using SGE.Repositorios;
 using SGE.UI.Components;
 
-
 BaseSqlite.Inicializar();
 
 var builder = WebApplication.CreateBuilder(args);
@@ -55,7 +54,7 @@ builder.Services
     .AddTransient<IServicioHash, ServicioHash>()
     .AddTransient<IEspecificacionCambioEstado, EspecificacionCambioEstado>()
     // CONTEXTO
-    .AddTransient<BaseContext>()
+    .AddScoped<BaseContext>()
     // SESION
     .AddSingleton<SesionActual>();
 

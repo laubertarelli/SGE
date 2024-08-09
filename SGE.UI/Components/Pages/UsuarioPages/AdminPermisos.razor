@@ -7,7 +7,7 @@
 <PageTitle>SGE | Usuarios</PageTitle>
 
 <div class="div-container">
-    <p id="heading">Permisos de @_user.Nombre @_user.Apellido</p>
+    <h2 id="heading">Permisos de @_user.Nombre @_user.Apellido</h2>
     <table class="table text-white p-2">
         <thead>
             <tr>
@@ -45,11 +45,11 @@
     List<Permiso> _permisos =
     [
         Permiso.ExpedienteAlta,
-        Permiso.ExpedienteBaja,
-        Permiso.ExpedienteModificacion,
-        Permiso.TramiteAlta,
-        Permiso.TramiteBaja,
-        Permiso.TramiteModificacion
+    Permiso.ExpedienteBaja,
+    Permiso.ExpedienteModificacion,
+    Permiso.TramiteAlta,
+    Permiso.TramiteBaja,
+    Permiso.TramiteModificacion
     ];
 
     protected override void OnInitialized()
