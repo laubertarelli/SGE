@@ -1,52 +1,55 @@
-﻿@page "/signup"
+﻿@page "/files/add"
 @rendermode InteractiveServer
-@inject SignupUserUseCase SignupCase
+@inject AddFileUseCase AddFileCase
 @inject NavigationManager Navigation
-<PageTitle>FMS | Signup</PageTitle>
+@inject Session Session
+<PageTitle>FMS | Files</PageTitle>
 
-<form class="form" @onsubmit="DoSignup">
-    <p id="heading">Sign Up</p>
+<form class="form" @onsubmit="Add">
+    <p id="heading">Add File</p>
     <div class="field">
-        <input class="input" type="text" placeholder="First name" @bind="_user.FirstName" />
+        <input class="input" placeholder="Cover" @bind="_file.Cover">
     </div>
     <div class="field">
-        <input class="input" type="text" placeholder="Last name" @bind="_user.LastName" />
-    </div>
-    <div class="field">
-        <input class="input" type="email" placeholder="Email" @bind="_user.Email" />
-    </div>
-    <div class="field">
-        <input class="input" type="password" placeholder="Password" @bind="_user.Password" />
-    </div>
-    <div class="field">
-        <input class="input" type="password" placeholder="Repeat password" @bind="_repPassword" />
+        <select class="input" @bind="_state">
+            <option value="" disabled selected>Select a state</option>
+            @foreach (FileState state in Enum.GetValues(typeof(FileState)))
+            {
+                <option>@state</option>
+            }
+        </select>
     </div>
     <div class="div-btn">
-        <button type="submit" class="button">Sign Up</button>
+        <button type="submit" class="button">Accept</button>
     </div>
 </form>
 <DialogueError @ref=_dialogue />
 
 @code {
-    User _user = new User();
     DialogueError _dialogue = null!;
-    string _repPassword = "";
+    File _file = new();
+    string _state = "";
 
-    void DoSignup()
+    void Add()
     {
         try
         {
-            if (!_repPassword.Equals(_user.Password))
-            {
-                throw new UserException("Passwords must match");
-            }
-            SignupCase.Execute(_user);
-            Navigation.NavigateTo("/");
+            _file.State = (FileState)Enum.Parse(typeof(FileState), _state);
+            AddFileCase.Execute(_file, Session.User!);
+            Navigation.NavigateTo($"/files/{(int)Math.Ceiling(_file.Id / 5.0)}");
         }
         catch (Exception ex)
         {
-            _dialogue.Show(ex.Message);
+            if (ex.Message == "Must specify valid information for parsing in the string. (Parameter 'value')")
+            {
+                _dialogue.Show("Must select a state");
+            }
+            else
+            {
+                _dialogue.Show(ex.Message);
+            }
         }
+
     }
 }
 
@@ -72,7 +75,6 @@
 
     .field {
         display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
         gap: 0.5em;

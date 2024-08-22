@@ -1,12 +1,12 @@
 ﻿@inherits LayoutComponentBase
-@inject SesionActual Sesion
+@inject Session Session
 @inject NavigationManager Navigation
 
 <div class="page">
     <header>
         <a class="d-flex gap-2 align-baseline text-decoration-none" href="/home">
             <img alt="logo" src="./logo.png" />
-            <span class="fs-2 fw-bold text-white">SGE</span>
+            <span class="fs-2 fw-bold text-white">FMS</span>
         </a>
         <div>
             <NavMenu />
@@ -19,7 +19,7 @@
         <div class="footer-container">
             <div class="footer-info">
                 <a class="footer-title text-white">
-                    <span>SGE</span>
+                    <span>FMS</span>
                 </a>
             </div>
         </div>
@@ -37,17 +37,17 @@
     {
         string url = Navigation.ToBaseRelativePath(Navigation.Uri).ToLower();
 
-        if (Sesion.User is null && !string.IsNullOrEmpty(url) && !url.StartsWith("signup") && !url.StartsWith("login"))
+        if (Session.User is null && !string.IsNullOrEmpty(url) && !url.StartsWith("signup") && !url.StartsWith("login"))
         {
             Navigation.NavigateTo("/");
         }
-        if (Sesion.User is not null)
+        if (Session.User is not null)
         {
             if (url.StartsWith("login") || url.StartsWith("signup"))
             {
-                Navigation.NavigateTo("/cuenta");
+                Navigation.NavigateTo("/account");
             }
-            if (!Sesion.User.IsAdmin && url.StartsWith("usuarios"))
+            if (!Session.User.IsAdmin && url.StartsWith("users"))
             {
                 Navigation.NavigateTo("/home");
             }

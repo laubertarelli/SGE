@@ -1,8 +1,8 @@
-using SGE.Aplicacion;
-using SGE.Repositorios;
+using SGE.Application;
+using SGE.Repositories;
 using SGE.UI.Components;
 
-BaseSqlite.Inicializar();
+FmsSqlite.Initialize();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,52 +11,52 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services
-    // CASOS DE EXPEDIENTE
-    .AddTransient<CasoDeUsoExpedienteAlta>()
-    .AddTransient<CasoDeUsoExpedienteBaja>()
-    .AddTransient<CasoDeUsoExpedienteModificacion>()
-    .AddTransient<CasoDeUsoExpedienteListar>()
-    .AddTransient<CasoDeUsoExpedienteConsultaId>()
-    .AddTransient<CasoDeUsoExpedienteContarTotal>()
-    // CASOS DE TRAMITE
-    .AddTransient<CasoDeUsoTramiteAlta>()
-    .AddTransient<CasoDeUsoTramiteBaja>()
-    .AddTransient<CasoDeUsoTramiteModificacion>()
-    .AddTransient<CasoDeUsoTramiteListar>()
-    .AddTransient<CasoDeUsoTramiteContarTotal>()
-    .AddTransient<CasoDeUsoTramiteContarPorEtiqueta>()
-    .AddTransient<CasoDeUsoTramiteContarPorExpId>()
-    .AddTransient<CasoDeUsoTramiteConsultaEtiqueta>()
-    .AddTransient<CasoDeUsoTramiteConsultaId>()
-    .AddTransient<CasoDeUsoTramiteConsultaExpId>()
-    // CASOS DE USUARIO
-    .AddTransient<CasoDeUsoUsuarioSignup>()
-    .AddTransient<CasoDeUsoUsuarioLogin>()
-    .AddTransient<CasoDeUsoUsuarioEliminar>()
-    .AddTransient<CasoDeUsoUsuarioModificacion>()
-    .AddTransient<CasoDeUsoUsuarioModContraseña>()
-    .AddTransient<CasoDeUsoUsuarioConsultaId>()
-    .AddTransient<CasoDeUsoUsuarioListar>()
-    .AddTransient<CasoDeUsoUsuarioContarTotal>()
-    .AddTransient<CasoDeUsoUsuarioOtorgarPermiso>()
-    .AddTransient<CasoDeUsoUsuarioQuitarPermiso>()
-    // VALIDADORES
-    .AddTransient<ExpedienteValidador>()
-    .AddTransient<TramiteValidador>()
-    .AddTransient<UsuarioValidador>()
-    // REPOSITORIOS
-    .AddTransient<IUsuarioRepositorio, RepositorioUsuarios>()
-    .AddTransient<IExpedienteRepositorio, RepositorioExpediente>()
-    .AddTransient<ITramiteRepositorio, RepositorioTramite>()
-    // SERVICIOS
-    .AddTransient<IServicioAutorizacion, ServicioAutorizacion>()
-    .AddTransient<IServicioActualizacionEstado, ServicioActualizacionEstado>()
-    .AddTransient<IServicioHash, ServicioHash>()
-    .AddTransient<IEspecificacionCambioEstado, EspecificacionCambioEstado>()
-    // CONTEXTO
-    .AddScoped<BaseContext>()
-    // SESION
-    .AddSingleton<SesionActual>();
+    // File Use Cases
+    .AddTransient<AddFileUseCase>()
+    .AddTransient<DeleteFileUseCase>()
+    .AddTransient<UpdateFileUseCase>()
+    .AddTransient<GetAllFilesUseCase>()
+    .AddTransient<GetFileByIdUseCase>()
+    .AddTransient<CountAllFilesUseCase>()
+    // Procedure Use Cases
+    .AddTransient<AddProcedureUseCase>()
+    .AddTransient<DeleteProcedureUseCase>()
+    .AddTransient<UpdateProcedureUseCase>()
+    .AddTransient<GetAllProceduresUseCase>()
+    .AddTransient<CountAllProceduresUseCase>()
+    .AddTransient<CountProceduresByLabelUseCase>()
+    .AddTransient<CountProceduresByFileIdUseCase>()
+    .AddTransient<GetProceduresByLabelUseCase>()
+    .AddTransient<GetProcedureByIdUseCase>()
+    .AddTransient<GetProceduresByFileIdUseCase>()
+    // User Use Cases
+    .AddTransient<SignupUserUseCase>()
+    .AddTransient<LoginUserUseCase>()
+    .AddTransient<DeleteUserUseCase>()
+    .AddTransient<UpdateUserUseCase>()
+    .AddTransient<UpdateUserPasswordUseCase>()
+    .AddTransient<GetUserByIdUseCase>()
+    .AddTransient<GetAllUsersUseCase>()
+    .AddTransient<CountAllUsersUseCase>()
+    .AddTransient<GrantUserPermissionUseCase>()
+    .AddTransient<RemoveUserPermissionUseCase>()
+    // Validators
+    .AddTransient<FileValidator>()
+    .AddTransient<ProcedureValidator>()
+    .AddTransient<UserValidator>()
+    // Repositories
+    .AddTransient<IUserRepository, UserRepository>()
+    .AddTransient<IFileRepository, FileRepository>()
+    .AddTransient<IProcedureRepository, ProcedureRepository>()
+    // Services
+    .AddTransient<IAuthorizationService, AuthorizationService>()
+    .AddTransient<IUpdateStateService, UpdateStateService>()
+    .AddTransient<IHashService, HashService>()
+    .AddTransient<ISpecificationStateChange, SpecificationStateChange>()
+    // Context
+    .AddScoped<FmsContext>()
+    // Session
+    .AddSingleton<Session>();
 
 var app = builder.Build();
 

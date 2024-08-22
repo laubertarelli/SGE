@@ -1,0 +1,250 @@
+﻿@page "/files/{Page:int?}"
+@rendermode InteractiveServer
+@inject Session Session
+@inject GetUserByIdUseCase GetUserCase
+@inject CountAllFilesUseCase CountFilesCase
+@inject GetAllFilesUseCase GetFilesCase
+@inject DeleteFileUseCase DeleteFileCase
+@inject NavigationManager Navigation
+<PageTitle>FMS | Files</PageTitle>
+
+<div class="div-container">
+    <button class="btn btn-primary p-2 mb-3" @onclick="() => Add()">+ Add File</button>
+    @if (_files.Count > 0)
+    {
+        <table class="table text-white p-2 text-center">
+            <thead>
+                <tr>
+                    <th class="text-start"># - Cover (State)</th>
+                    <th>Procedures</th>
+                    <th>Last Edition</th>
+                    <th>Created At</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (File file in _files)
+                {
+                    <tr>
+                        <td class="text-start">#@file.Id - @file.Cover<br>(@file.State)</td>
+                        <td>@file.Procedures.Count</td>
+                        <td>@GetName(file)<br>@file.EditionDate</td>
+                        <td>@file.CreationDate</td>
+                        <td>
+                            <button class="btn btn-success" @onclick="() => View(file.Id)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+                                    <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0" />
+                                    <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7" />
+                                </svg>
+                            </button>
+                            <button class="btn btn-pencil" @onclick="() => Update(file.Id)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+                                    <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z" />
+                                </svg>
+                            </button>
+                            <button class="btn btn-danger" @onclick="() => _dialogueDelete.Show(file.Id)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                    <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5" />
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <nav class="nav">
+            <span>Mostrando @(_totalFiles > 0 ? ((_page - 1) * 5) + 1 : "0") - @((_page * 5) < _totalFiles ? _page * 5 : _totalFiles) de @_totalFiles</span>
+            @if (_totalPages > 1)
+            {
+                <ul>
+                    <li>
+                        <div class="element prev" href="#" @onclick="PreviousPage">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrow-left-short" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5" />
+                            </svg>
+                        </div>
+                    </li>
+                    @for (int i = 1; i <= Math.Min(_totalPages, 5); i++)
+                    {
+                        if (i == _page)
+                        {
+                            <li>
+                                <a class="element num-selected" href="@($"files/{i}")">@i</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li>
+                                <a class="element" href="@($"files/{i}")">@i</a>
+                            </li>
+                        }
+                    }
+                    <li>
+                        <div class="element next" href="#" @onclick="NextPage">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrow-right-short" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8" />
+                            </svg>
+                        </div>
+                    </li>
+                </ul>
+            }
+        </nav>
+    }
+    else
+    {
+        <h5>There are not files</h5>
+    }
+</div>
+<DialogueError @ref=_dialogueError />
+<DialogueDelete @ref=_dialogueDelete OnConfirmed="@(id => Delete((int)id))" />
+
+@code {
+    [Parameter] public int? Page { get; set; } = 1;
+    DialogueError _dialogueError = null!;
+    DialogueDelete _dialogueDelete = null!;
+    List<File> _files = [];
+    int _page;
+    int _totalFiles;
+    int _totalPages;
+
+    bool HasPrevious => _page > 1;
+    bool HasNext => _page < _totalPages;
+    void Add() => Navigation.NavigateTo("files/add");
+    void Update(int id) => Navigation.NavigateTo($"files/update/{id}");
+    void View(int id) => Navigation.NavigateTo($"files/view/{id}");
+    string GetName(File file)
+    {
+        try
+        {
+            return GetUserCase.Execute(file.UserId).FullName;
+        }
+        catch
+        {
+            return "User not found";
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        _totalFiles = CountFilesCase.Execute();
+        _totalPages = (int)Math.Ceiling(_totalFiles / 5.0);
+        _page = Page ?? 1;
+        _files = GetFilesCase.Execute(_page);
+    }
+
+    protected override void OnParametersSet()
+    {
+        _page = Page ?? 1;
+        if (_page < 1)
+        {
+            Navigation.NavigateTo("files");
+        }
+        if (_totalPages > 0 && _page > _totalPages)
+        {
+            Navigation.NavigateTo($"files/{_totalPages}");
+        }
+        _files = GetFilesCase.Execute(_page);
+    }
+
+    void NextPage()
+    {
+        if (HasNext)
+        {
+            Page = _page + 1;
+            Navigation.NavigateTo($"files/{Page}");
+        }
+    }
+    void PreviousPage()
+    {
+        if (HasPrevious)
+        {
+            Page = _page - 1;
+            Navigation.NavigateTo($"files/{Page}");
+        }
+    }
+
+    void Delete(int id)
+    {
+        try
+        {
+            DeleteFileCase.Execute(id, Session.User!);
+            Navigation.Refresh(true);
+        }
+        catch (Exception ex)
+        {
+            _dialogueError.Show(ex.Message);
+        }
+    }
+}
+
+<style>
+    .div-container {
+        background-color: #1f2937;
+        width: 65%;
+        padding: 1.3rem 2rem;
+        border-radius: 10px;
+    }
+
+    .btn {
+        padding: .275rem .65rem;
+    }
+
+    .btn-pencil {
+        background-color: #ff7e22;
+    }
+
+        .btn-pencil:hover {
+            background-color: #c55d12;
+        }
+
+    .nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0px auto;
+        padding: 0.5rem;
+    }
+
+        .nav ul {
+            display: inline-flex;
+            align-items: stretch;
+            margin-left: 1rem;
+            margin-bottom: 0;
+            list-style: none;
+        }
+
+    .element {
+        display: flex;
+        cursor: pointer;
+        text-decoration: none;
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        padding: 0.50rem 0.75rem;
+        margin-left: 0;
+        color: rgb(156, 163, 175);
+        background-color: #1f2937;
+        border: 1px solid rgb(55, 65, 81);
+    }
+
+        .element:hover {
+            color: white;
+            background-color: rgb(55, 65, 81);
+        }
+
+    .prev {
+        border-top-left-radius: 0.5rem;
+        border-bottom-left-radius: 0.5rem;
+    }
+
+    .num-selected {
+        color: white;
+        background-color: rgb(55, 65, 81);
+    }
+
+    .next {
+        border-top-right-radius: 0.5rem;
+        border-bottom-right-radius: 0.5rem;
+    }
+</style>

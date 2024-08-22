@@ -1,18 +1,18 @@
-﻿@inject SesionActual Sesion
+﻿@inject Session Session
 
 <div>
     <nav class="div-nav">
-        @if (Sesion.User is not null)
+        @if (Session.User is not null)
         {
             <ul class="nav-links">
-                <li><a href="/expedientes">Expedientes</a></li>
-                <li><a href="/tramites">Tramites</a></li>
-                @if (Sesion.User.IsAdmin)
+                <li><a href="/files">Files</a></li>
+                <li><a href="/procedures">Procedures</a></li>
+                @if (Session.User.IsAdmin)
                 {
-                    <li><a href="/usuarios">Usuarios</a></li>
+                    <li><a href="/users">Users</a></li>
                 }
             </ul>
-            <a href="/cuenta"><button class="btn-header">Cuenta</button></a>
+            <a href="/account"><button class="btn-header">Account</button></a>
         }
     </nav>
 </div>
@@ -47,7 +47,7 @@
     .btn-header {
         margin-left: 20px;
         padding: 9px 25px;
-        background-color: #2563EB;
+        background-color: #1b6ec2;
         border: none;
         border-radius: 50px;
         cursor: pointer;
@@ -56,4 +56,7 @@
         color: #edf0f1;
         text-decoration: none;
     }
+        .btn-header:hover {
+            background-color: #0b5ed7;
+        }
 </style>

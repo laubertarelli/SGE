@@ -1,17 +1,26 @@
 ﻿@page "/home"
-<PageTitle>SGE | Home</PageTitle>
+<PageTitle>FMS | Home</PageTitle>
 @inherits LayoutComponentBase
 
-<div>
-    <h2>Sistema de Gestión de Expedientes</h2>
-    <h4>Características del Sistema</h4>
+<div class="container">
+    <h2>File Management System</h2>
+    <h4>Features</h4>
     <ul>
-        <li>Posibilita la organización y administración efectiva de expedientes y trámites. Ambos elementos serán gestionados y persistidos de forma independiente.</li>
-        <li>Gestiona usuarios y sus respectivos permisos. Todos los usuarios tendrán acceso de lectura sobre ambas entidades.</li>
+        <li>Enables the effective organization and administration of files and procedures. Both elements will be managed and persisted independently.</li>
+        <li>Manages users and their respective permissions. All users will have read access to both entities.</li>
         <li>
-            El primer usuario que se registre en el sistema será el Administrador, sólo él tendrá los permisos necesarios para listar, dar de baja y modificar cualquier usuario o sus permisos.
+            The first user to register in the system will be the Administrator, only he will have the necessary permissions to list, delete and update any user or their permissions.
         </li>
-        <li>Para realizar altas, bajas o modificaciones será necesario contar con permisos explícitos.</li>
-        <li>Realiza validaciones para evitar el ingreso de elementos que no cumplan con ciertos requisitos.</li>
+        <li>To perform additions, deletions or modifications, explicit permissions will be required.</li>
+        <li>Performs validations to prevent the entry of elements that do not satisfy certain requirements.</li>
     </ul>
 </div>
+
+<style>
+    .container {
+        background-color: #1f2937;
+        width: 65%;
+        padding: 1.8rem 2rem;
+        border-radius: 10px;
+    }
+</style>

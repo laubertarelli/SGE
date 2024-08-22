@@ -1,0 +1,139 @@
+﻿@page "/files/view/{Id:int}"
+@rendermode InteractiveServer
+@inject NavigationManager Navigation
+@inject GetUserByIdUseCase GetUserCase
+@inject GetFileByIdUseCase GetFileCase
+<PageTitle>FMS | Files</PageTitle>
+
+<div class="container">
+    <h2 id="heading">File #@_file.Id</h2>
+    <div class="form">
+        <div class="cover-container">
+            <label for="cover">Cover</label>
+            <input class="input" readonly type="text" id="cover" value="@_file.Cover" />
+        </div>
+        <div>
+            <label for="state">State</label>
+            <input readonly class="input" type="text" id="state" value="@_file.State" /> 
+        </div>
+        <div>
+            <label for="creation">Creation Date</label>
+            <input readonly class="input" type="text" id="creation" value="@_file.CreationDate" />
+        </div>
+        <div>
+            <label for="user">Last Edition User</label>
+            <input readonly class="input" type="text" id="user" value="@GetName()" />
+        </div>
+        <div>
+            <label for="edition">Last Edition Date</label>
+            <input readonly class="input" type="text" id="edition" value="@_file.EditionDate" />
+        </div>
+        <div class="div-btn">
+            <button @onclick="Update" class="button" type="button">Update</button>
+            <button @onclick="ViewProcedures" class="button grey" type="button">Procedures</button>
+        </div>
+
+    </div>
+</div>
+
+@code {
+    [Parameter] public int Id { get; set; }
+    File _file = new();
+
+    void Update() => Navigation.NavigateTo($"files/update/{_file.Id}");
+    void ViewProcedures() => Navigation.NavigateTo($"procedures/file/{_file.Id}");
+    string GetName()
+    {
+        try
+        {
+            return GetUserCase.Execute(_file.UserId).FullName;
+        }
+        catch
+        {
+            return "User not found";
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        try
+        {
+            _file = GetFileCase.Execute(Id);
+        }
+        catch
+        {
+            Navigation.NavigateTo("files");
+        }
+    }
+}
+
+<style>
+    .container {
+        background-color: #1f2937;
+        max-width: 42rem;
+        margin-top: 2rem;
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+        padding-bottom: 2rem;
+        border-radius: 10px;
+    }
+
+    #heading {
+        text-align: center;
+        margin: 2rem;
+        font-size: 1.2em;
+    }
+
+    .form {
+        display: grid;
+        gap: 1.5rem;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    label {
+        font-weight: 500;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .cover-container {
+        grid-column: span 2 / span 2;
+    }
+
+    .input {
+        display: block;
+        background-color: rgb(55 65 81);
+        border: none;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        padding: 0.625rem;
+        outline: none;
+        width: 100%;
+        color: #d3d3d3;
+    }
+
+    .div-btn {
+        display: flex;
+        justify-content: space-between;
+        grid-column: span 2 / span 2;
+    }
+
+    .button {
+        padding: 0.5em;
+        padding-left: 1.1em;
+        padding-right: 1.1em;
+        border-radius: 5px;
+        border: none;
+        outline: none;
+        background-color: #2563EB;
+        color: white;
+    }
+
+    .grey {
+        background-color: #6C757D;
+    }
+</style>

@@ -1,0 +1,88 @@
+﻿@page "/users/update/{Id:int}/permissions"
+@rendermode InteractiveServer
+@inject NavigationManager Navigation
+@inject GrantUserPermissionUseCase GrantPermissionCase
+@inject RemoveUserPermissionUseCase RemovePermissionCase
+@inject GetUserByIdUseCase GetUserCase
+<PageTitle>FMS | Users</PageTitle>
+
+<div class="div-container">
+    <h2 id="heading">User #@_user.Id Permissions</h2>
+    <table class="table text-white p-2">
+        <thead>
+            <tr>
+                <th>Permission</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Permission permission in Enum.GetValues(typeof(Permission)))
+            {
+                <tr>
+                    <td>@_user.GetPermissionParsed(permission)</td>
+                    <td>
+                        @if (IsAvailable(permission))
+                        {
+                            <button class="btn btn-danger width" @onclick="() => Remove(permission)">Remove</button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-success width" @onclick="() => Grant(permission)">Grant</button>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    [Parameter] public int Id { get; set; }
+    User _user = new();
+
+    protected override void OnInitialized()
+    {
+        try
+        {
+            _user = GetUserCase.Execute(Id);
+        }
+        catch
+        {
+            Navigation.NavigateTo("/users");
+        }
+    }
+
+    bool IsAvailable(Permission permission) => _user.Permissions.Any(p => p == permission);
+
+    void Remove(Permission permission)
+    {
+        RemovePermissionCase.Execute(_user.Id, permission);
+        OnInitialized();
+    }
+
+    void Grant(Permission permission)
+    {
+        GrantPermissionCase.Execute(_user.Id, permission);
+        OnInitialized();
+    }
+}
+
+<style>
+    .div-container {
+        background-color: #1f2937;
+        width: 35%;
+        padding: 1.3rem 2rem;
+        border-radius: 10px;
+    }
+
+    #heading {
+        text-align: center;
+        margin: 1rem;
+        color: rgb(255, 255, 255);
+        font-size: 1.2rem;
+    }
+
+    .width {
+        width: 88px;
+    }
+</style>

@@ -1,9 +1,9 @@
 ﻿@page "/"
-@inject SesionActual Sesion
+@inject Session Session
 @inject NavigationManager Navigation
-<PageTitle>SGE</PageTitle>
+<PageTitle>FMS</PageTitle>
 
-@if (Sesion.User is null)
+@if (Session.User is null)
 {
     <Login />
     //Navigation.NavigateTo("/login");

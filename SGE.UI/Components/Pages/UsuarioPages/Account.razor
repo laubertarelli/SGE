@@ -1,0 +1,172 @@
+﻿@page "/account"
+@rendermode InteractiveServer
+@inject Session Session
+@inject UpdateUserUseCase UpdateUserCase
+@inject GetUserByIdUseCase GetUserCase
+@inject NavigationManager Navigation
+<PageTitle>FMS | Account</PageTitle>
+
+<form class="form">
+    <p id="heading">Personal Data</p>
+    @if (!_update)
+    {
+        <div class="field">
+            <input readonly class="input" type="text" value="@_user.FirstName" />
+        </div>
+        <div class="field">
+            <input readonly class="input" type="text" value="@_user.LastName" />
+        </div>
+        <div class="field">
+            <input readonly class="input" type="text" value="@_user.Email" />
+        </div>
+        <div class="div-toggle">
+            <button type="button" class="button" @onclick="Toggle">Update</button>
+        </div>
+    }
+    else
+    {
+        <div class="field">
+            <input class="input" type="text" placeholder="First name" @bind="_user.FirstName" @ref="_firstName" />
+        </div>
+        <div class="field">
+            <input class="input" type="text" placeholder="Last name" @bind="_user.LastName" @ref="_lastName" />
+        </div>
+        <div class="field">
+            <input class="input" type="email" placeholder="Email" @bind="_user.Email" @ref="_email" />
+        </div>
+        <div class="field">
+            <input class="input" type="password" placeholder="Confirm password" @bind="_password" />
+        </div>
+        <div class="div-btn">
+            <button type="button" class="button" @onclick="Update">Save changes</button>
+        </div>
+    }
+    <div class="div-btn">
+        <button type="button" class="button pw" @onclick="ChangePassword">Change password</button>
+        <button type="button" class="button lo" @onclick="LogOut">Log out</button>
+    </div>
+</form>
+<DialogueError @ref=_dialogue />
+
+@code {
+    DialogueError _dialogue = null!;
+    User _user = new();
+    ElementReference _firstName;
+    ElementReference _lastName;
+    ElementReference _email;
+    string _password = "";
+    bool _update = false;
+
+    void Toggle() => _update = !_update;
+    void ChangePassword() => Navigation.NavigateTo($"account/change-password");
+
+    protected override void OnInitialized()
+    {
+        _user = Session.User!;
+    }
+
+    void Update()
+    {
+        try
+        {
+            UpdateUserCase.Execute(Session.User!, _password);
+            _password = "";
+            Toggle();
+            OnInitialized();
+        }
+        catch (Exception ex)
+        {
+            _dialogue.Show(ex.Message);
+        }
+    }
+
+    void LogOut()
+    {
+        Session.User = null;
+        Navigation.NavigateTo("/");
+    }
+}
+
+<style>
+    .form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background-color: #1f2937;
+        width: 510px;
+        padding-left: 2em;
+        padding-right: 2em;
+        padding-bottom: 0.4em;
+        border-radius: 10px;
+    }
+
+    #heading {
+        text-align: center;
+        margin: 2em;
+        color: rgb(255, 255, 255);
+        font-size: 1.2em;
+    }
+
+    .field {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5em;
+        border-radius: 10px;
+        padding: 0.6em;
+        border: none;
+        outline: none;
+        color: white;
+        background-color: #374151;
+    }
+
+    .input {
+        background: none;
+        border: none;
+        outline: none;
+        width: 100%;
+        color: #d3d3d3;
+    }
+
+    option {
+        background-color: #374151;
+        color: #d3d3d3;
+        padding: 1rem;
+    }
+
+    .div-toggle {
+        display: flex;
+        justify-content: center;
+        margin-top: 1rem;
+        padding: .375rem .75rem;
+    }
+
+    .div-btn {
+        display: flex;
+        justify-content: center;
+        flex-direction: row;
+        gap: 8px;
+        padding: .375rem .75rem;
+    }
+
+    .button {
+        padding: 0.5em;
+        padding-left: 1.1em;
+        padding-right: 1.1em;
+        border-radius: 5px;
+        border: none;
+        outline: none;
+        background-color: #2563EB;
+        color: white;
+    }
+
+    .pw {
+        background-color: #6C757D;
+    }
+
+    .lo {
+        background-color: #C82333;
+        width: 202px;
+    }
+</style>

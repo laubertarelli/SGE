@@ -1,51 +1,60 @@
-﻿@page "/signup"
+﻿@page "/procedures/add"
 @rendermode InteractiveServer
-@inject SignupUserUseCase SignupCase
+@inject AddProcedureUseCase AddProcedureCase
+@inject GetFileByIdUseCase GetFileCase
 @inject NavigationManager Navigation
-<PageTitle>FMS | Signup</PageTitle>
+@inject Session Session
+<PageTitle>FMS | Procedures</PageTitle>
 
-<form class="form" @onsubmit="DoSignup">
-    <p id="heading">Sign Up</p>
+<form class="form" @onsubmit="Add">
+    <p id="heading">Add Procedure</p>
     <div class="field">
-        <input class="input" type="text" placeholder="First name" @bind="_user.FirstName" />
+        <input type="text" class="input" placeholder="# File Container" @bind="_fileId" />
     </div>
     <div class="field">
-        <input class="input" type="text" placeholder="Last name" @bind="_user.LastName" />
+        <input type="text" class="input" placeholder="Content" @bind="_procedure.Content" />
     </div>
     <div class="field">
-        <input class="input" type="email" placeholder="Email" @bind="_user.Email" />
-    </div>
-    <div class="field">
-        <input class="input" type="password" placeholder="Password" @bind="_user.Password" />
-    </div>
-    <div class="field">
-        <input class="input" type="password" placeholder="Repeat password" @bind="_repPassword" />
+        <select class="input" @bind="_label">
+            <option value="" disabled selected>Select a label</option>
+            @foreach (ProcedureLabel label in Enum.GetValues(typeof(ProcedureLabel)))
+            {
+                <option>@label</option>
+            }
+        </select>
     </div>
     <div class="div-btn">
-        <button type="submit" class="button">Sign Up</button>
+        <button type="submit" class="button">Accept</button>
     </div>
 </form>
 <DialogueError @ref=_dialogue />
 
 @code {
-    User _user = new User();
     DialogueError _dialogue = null!;
-    string _repPassword = "";
+    Procedure _procedure = new();
+    string _fileId = "";
+    string _label = "";
 
-    void DoSignup()
+    void Add()
     {
         try
         {
-            if (!_repPassword.Equals(_user.Password))
-            {
-                throw new UserException("Passwords must match");
-            }
-            SignupCase.Execute(_user);
-            Navigation.NavigateTo("/");
+            GetFileCase.Execute(Int32.Parse(_fileId));
+            _procedure.FileId = Int32.Parse(_fileId);
+            _procedure.Label = (ProcedureLabel)Enum.Parse(typeof(ProcedureLabel), _label);
+            AddProcedureCase.Execute(_procedure, Session.User!);
+            Navigation.NavigateTo($"/procedures/{(int)Math.Ceiling(_procedure.Id / 5.0)}");
         }
         catch (Exception ex)
         {
-            _dialogue.Show(ex.Message);
+            if (ex.Message == "Must specify valid information for parsing in the string. (Parameter 'value')")
+            {
+                _dialogue.Show("Must select a label");
+            }
+            else
+            {
+                _dialogue.Show(ex.Message);
+            }
         }
     }
 }
@@ -72,7 +81,6 @@
 
     .field {
         display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
         gap: 0.5em;
